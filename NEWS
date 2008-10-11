@@ -1,0 +1,160 @@
+User-visible changes between 2.4 and 2.5 include:
+
+ - Autotools.  This should make life easier for distributors.  ;-)
+
+User-visible changes between 2.3 and 2.4 include:
+
+ - Keyboard layout switching.  Now you can specify "-l QWERTZ"
+   or "-l AZERTY" and keyboard layout will be (hopefully) usable.
+
+ - Implement output rate limiting; specifying "-r 31.25" in a command
+   line will limit jack-keyboard to the rate mandated by the MIDI
+   specification.
+
+ - Remove the "-n" option; not connecting to the MIDI port at startup
+   is the default behaviour.
+
+ - Start jackd automatically, even when not compiled against LASH.
+
+ - Fix "make install" on systems without /usr/local/share/icons/hicolor.
+
+User-visible changes between 2.2 and 2.3 include:
+
+ - Fix "make install" on systems without /usr/local/bin.
+
+ - Fix crash with jackdmp, reported and tested by Juuso Alasuutari.
+
+ - Make it possible to switch between windows using Alt-Tab
+   when the keyboard is grabbed.
+
+User-visible changes between 2.1 and 2.2 include:
+
+ - Add 4 to "Octave".  What that means is, C4 is in octave #4,
+   not #0.
+
+ - Icon ;-)
+
+ - Documentation updates.
+
+User-visible changes between 2.0 and 2.1 include:
+
+ - It's possible to change "high" and "low" velocity.  To change
+   the former, press and hold Shift key and move slider.  To change
+   the latter, do the same with Ctrl key.
+
+   Moving the slider without Ctrl or Shift held changes "normal"
+   velocity.
+
+ - Fix ugly memory corruption that could cause strange behaviour
+   (including crashes) in pianola mode.
+
+User-visible changes between 1.8 and 2.0 include:
+
+ - GUI; now jack-keyboard should be more intuitive.  It can be turned
+   off using -G option.
+
+ - Support keyboard grabbing - with the -K option, jack-keyboard
+   will get all the keyboard input, even when it does not have focus.
+   In other words, you can play while mousing in different program
+   (synth, for example) at the same time.
+
+   Note that this will not work if another application grabs
+   the keyboard.
+ 
+ - LASH support.
+
+ - Install ".desktop" file.
+
+Changes between 1.7 and 1.8:
+
+ - Fix compilation with SVN version of JACK.
+
+Changes between 1.6 and 1.7:
+
+ - Add "keyboard cue" to show you which part of virtual keyboard your
+   PC keyboard keys are currently mapped to.  It looks a little ugly,
+   so it's disabled by default; you can enable it using "-C" option.
+
+ - Add an "-u" option to automatically send bank/program change messages
+   after reconnecting
+
+ - Warn when bank/program shown in title bar could be different than the
+   one used by the synth
+
+ - Fix setting bank/program from the command line
+
+Changes between 1.5 and 1.6:
+
+ - Send messages with proper time offsets.  If you don't like this,
+   you can make jack-keyboard behave same as before by using -t option
+
+ - Implement MIDI channel switching (submitted by Nedko Arnaudov)
+
+ - Make it possible to enter bank/program number directly using keypad
+
+ - Make bank switching actually work
+ 
+ - Don't crash when clicking _and_ releasing mouse button on the gray area
+
+Changes between 1.4 and 1.5:
+
+ - Add "pianola mode" - jack-keyboard now has a MIDI input port; events received
+   on this port will change the visible state of keyboard - basically, you will
+   see the notes played.  Note that, by default, jack-keyboard will refuse to
+   connect to other clients named 'jack-keyboard'; this is to prevent loops.
+
+ - Make panic key more reliable
+
+ - Numeric keys (top row on the alphanumeric keyboard) pressed with Shift held
+   should work correctly now
+
+ - Threading fixes - if jack-keyboard behaved in unpredictable way, it should
+   be fixed now
+
+ - Add manual page
+
+ - Add 'install' Makefile target ;-)
+
+Changes between 1.3 and 1.4:
+
+ - Don't stop the notes when moving mouse outside of the window (suggested by ctaf @ #lad)
+
+ - Show some useful information in the window title
+
+ - Rewrite MIDI input switching to make it more robust
+
+ - Remove the command line MIDI port selection.  Just use Insert/Delete keys to cycle to the
+   port you need
+
+ - Don't refuse to start when there are no MIDI input ports to connect to (suggested by Nedko Arnaudov)
+
+Changes between 1.2 and 1.3:
+
+ - Use the ringbuffer instead of old 'table of notes'.  Now the notes won't
+   get lost even under high CPU load
+
+ - Add 'panic key', under 'Esc' key, that stops all sounds
+
+ - Add Bank Change (Home/End)
+
+Changes between 1.1 and 1.2:
+
+ - Make it possible to run several instances of jack-keyboard at the same time
+
+ - Add the ability to switch MIDI inputs at runtime (Insert/Delete keys)
+
+ - Warn about JACK timing problems
+
+ - Minor display optimization
+
+ - Fix crash after pressing highest (#127) note
+
+Changes between 1.0 and 1.1:
+
+ - Speed up redrawing
+
+ - Add MIDI port selection ("jack-keyboard 3" will connect to fourth available
+   JACK MIDI input port)
+
+ - Fix sustain key (space)
+

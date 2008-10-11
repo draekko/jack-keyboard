@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=JACK Keyboard
+Comment=Virtual keyboard for JACK MIDI
+Exec=jack-keyboard
+Icon=jack-keyboard.png
+Categories=Application;AudioVideo;Audio;Midi;
+Terminal=false
+Type=Application

@@ -1,0 +1,13 @@
+Things to do, eventually:
+
+ - I know nothing about designing GUIs, and I'm afraid it shows.  Redesign.
+
+ - Jack-keyboard does strange things to input focus and keyboard event
+   handling.  Verify that it does not cause any problems.
+
+ - Make the code cleaner.  Get rid of all these global variables etc.
+
+ - Tooltips.
+
+ - Fix language (english) errors in documentation and web page.
+
