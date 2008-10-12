@@ -1,0 +1,324 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
+<refentry>
+	<refmeta>
+		<refentrytitle>
+			<application>jack-keyboard</application>
+		</refentrytitle>
+		<manvolnum>1</manvolnum>
+		<refmiscinfo>jack-keyboard 2.5</refmiscinfo>
+	</refmeta>
+	<refnamediv>
+		<refname>
+			<application>jack-keyboard</application>
+		</refname>
+		<refpurpose>
+			A virtual keyboard for JACK MIDI
+		</refpurpose>
+	</refnamediv>
+	<refsynopsisdiv>
+		<cmdsynopsis>
+			<command>jack-keyboard</command>
+			<arg><option>-C</option></arg>
+			<arg><option>-G</option></arg>
+			<arg><option>-K</option></arg>
+			<arg><option>-T</option></arg>
+			<arg><option>-V</option></arg>
+			<arg><option>-a <replaceable class="parameter">input port</replaceable></option></arg>
+			<arg><option>-k</option></arg>
+			<arg><option>-r <replaceable class="parameter">rate</replaceable></option></arg>
+			<arg><option>-t</option></arg>
+			<arg><option>-u</option></arg>
+			<arg><option>-c <replaceable class="parameter">channel</replaceable></option></arg>
+			<arg><option>-b <replaceable class="parameter">bank</replaceable></option></arg>
+			<arg><option>-p <replaceable class="parameter">program</replaceable></option></arg>
+			<arg><option>-l <replaceable class="parameter">layout</replaceable></option></arg>
+		</cmdsynopsis>
+	</refsynopsisdiv>
+	<refsect1>
+		<title>OPTIONS</title>
+		<variablelist>
+			<varlistentry>
+				<term>-C</term>
+				<listitem>
+					<para>
+						Enable "keyboard cue" - two
+						horizontal lines over a part of keyboard; keys under the lower line are mapped
+						to the lower row of your PC keyboard; keys under the upper line are mapped
+						to the upper row.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-G</term>
+				<listitem>
+					<para>
+						Disable GUI.  It makes <command>jack-keyboard</command> look like it did before version 2.0.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-K</term>
+				<listitem>
+					<para>
+						Grab the keyboard.  This makes <command>jack-keyboard</command> receive keyboard events
+						even when it does not have focus.  In other words, you can play while mousing in a different
+						window.
+					</para>
+					<para>
+						Note: It's not reliable yet.  It does not work when some other application keeps
+						the keyboard grabbed.  It does not work with GNOME.  Even when it seems to work,
+						some keyboard events may get lost.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-T</term>
+				<listitem>
+					<para>
+						Toggle titlebar, on which channel/bank/program information is shown.
+						With -G option, it disables titlebar; otherwise it enables it.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-V</term>
+				<listitem>
+					<para>
+						Print version number to standard output and exit.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-a <replaceable class="parameter">input port</replaceable></term>
+				<listitem>
+					<para>
+						Automatically connect to the named input port.  Note that this may cause problems with LASH.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-k</term>
+				<listitem>
+					<para>
+						Allow connecting to other instances of jack-keyboard (see PIANOLA MODE below).
+					       	Without this option, <command>jack-keyboard</command> will refuse to connect to any
+						JACK client whose name starts in "jack-keyboard"; this is to prevent loops.
+						Note that it's impossible to connect instance of <command>jack-keyboard</command>
+						to itself, even with this option set.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-r <replaceable class="parameter">rate</replaceable></term>
+				<listitem>
+					<para>
+						Set rate limit to <replaceable class="parameter">rate</replaceable>, in Kbaud.  Limit
+						defined by the MIDI specification is 31.25.  By default this parameter is zero, that
+						is, rate limiting is disabled.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-t</term>
+				<listitem>
+					<para>
+						Send all MIDI messages with zero time offset, making them play as soon
+						as they reach the synth.  This was the default behavior before version 1.6.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-u</term>
+				<listitem>
+					<para>
+						By default, <command>jack-keyboard</command> does not send program/bank
+						change messages after reconnecting, so the newly connected instrument
+						remains at previous settings.  This option changes that behaviour.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-c <replaceable class="parameter">channel</replaceable></term>
+				<listitem>
+					<para>
+						Set initial MIDI channel to <replaceable class="parameter">channel</replaceable>;
+						by default it's 1.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-b <replaceable class="parameter">bank</replaceable></term>
+				<listitem>
+					<para>
+						Set initial MIDI bank to <replaceable class="parameter">bank</replaceable>.
+						With this option, <command>jack-keyboard</command> will send the bank/program
+						change once, when it connects. 
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-p <replaceable class="parameter">program</replaceable></term>
+				<listitem>
+					<para>
+						Set initial MIDI program to <replaceable class="parameter">program</replaceable>.
+						With this option, <command>jack-keyboard</command> will send the bank/program
+						change once, when it connects. 
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>-l <replaceable class="parameter">layout</replaceable></term>
+				<listitem>
+					<para>
+						Specify the layout of computer keyboard being used.  Valid arguments are QWERTY,
+						QWERTZ and AZERTY.  Default is QWERTY.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</refsect1>
+	<refsect1>
+		<title>DESCRIPTION</title>
+		<para>
+			<command>jack-keyboard</command> is a virtual MIDI keyboard - a program that allows
+			you to send JACK MIDI events (play ;-) using your PC keyboard.  It's
+			somewhat similar to <command>vkeybd</command>, except it uses JACK MIDI instead of
+			ALSA, and the default keyboard mapping is much better - it uses the same
+			layout as trackers (like Impulse Tracker) did, so you have two and
+			half octaves under your fingers.
+		</para>
+	</refsect1>
+
+	<refsect1>
+		<title>KEY BINDINGS</title>
+		<para>
+			Keyboard mapping is the same as in Impulse Tracker.  This is your
+			QWERTY keyboard:
+
+		<screen>
+		   +----+----+    +----+----+----+    +----+----+
+		   | 2  | 3  |    | 5  | 6  | 7  |    | 9  | 0  |
+		+----+----+----+----+----+----+----+----+----+----+
+		| Q  | W  | E  | R  | T  | Y  | U  | I  | O  | P  |
+		+----+----+----+----+----+----+----+----+----+----+
+		       | S  | D  |    | G  | H  | J  |
+		    +----+----+----+----+----+----+----+
+		    | Z  | X  | C  | V  | B  | N  | M  |
+		    +----+----+----+----+----+----+----+
+		</screen>
+
+		And this is MIDI mapping:
+
+		<screen>
+		   +----+----+    +----+----+----+    +----+----+
+		   |C#5 |D#5 |    |F#5 |G#5 |A#5 |    |C#6 |D#6 |
+		+----+----+----+----+----+----+----+----+----+----+
+		| C5 | D5 | E5 | F5 | G5 | A5 | B5 | C6 | D6 | E6 |
+		+----+----+----+----+----+----+----+----+----+----+
+		       |C#4 |D#4 |    |F#4 |G#4 |A#4 |
+		    +----+----+----+----+----+----+----+
+		    | C4 | D4 | E4 | F4 | G4 | A4 | B4 |
+		    +----+----+----+----+----+----+----+
+		</screen>
+
+		</para>
+
+		<para>
+			Spacebar is a sustain key.  Holding it when pressing or releasing key
+			will make that key sustained, i.e. Note Off MIDI event won't be sent
+			after releasing the key.  To release (stop) all the sustained notes,
+			press and release spacebar.
+		</para>
+
+		<para>
+			Holding Shift when pressing note will make it louder (it increases
+			velocity).  Holding Ctrl will do the opposite.  You can change the
+			default velocity by moving the Velocity slider.  You can change the "high"
+			and "low" velocity values by moving the slider while holding Shift
+			or Ctrl keys.
+		</para>
+
+		<para>Pressing "-" and "+"
+			keys on numeric keypad changes the octave your keyboard is mapped to.
+			Pressing "*" and "/" on numeric keypad changes
+			MIDI program (instrument).  Pressing Insert or Delete keys will
+			connect <command>jack-keyboard</command> to the next/previous MIDI input port (it will cycle between running
+			instances of ghostess, for example).  Home and End keys change the MIDI channel.
+			Page Up and Page Down keys switch the MIDI bank.
+		</para>
+		<para>
+			Esc works as a panic key - when you press it, all sound stops.
+		</para>
+	</refsect1>
+
+	<refsect1>
+		<title>SETTING CHANNEL/BANK/PROGRAM NUMBER DIRECTLY</title>
+		<para>
+			To switch directly to a channel, bank or program, enter its number on the numeric
+			keypad (it won't be shown in any way) and press Home or End (to change channel),
+			Page Up or Page Down (to change bank) or "/" or "*"
+			(to change program).  For example, to change to program number 123,
+			type, on the numeric keypad, "123/", without quotes.
+		</para>
+	</refsect1>
+
+	<refsect1>
+		<title>TITLEBAR</title>
+		<para>
+			When <option>-G</option> xor <option>-T</option> is given, some informational
+			messages in the title bar appear. They are supposed to be self explanatory.
+		       	If you see "bank/program change not sent",
+			it means that the bank/program numbers as seen in the title bar were not sent.  In other words,
+			synth the <command>jack-keyboard</command> is connected to may use different values.  This happens
+			at startup and after switching between synths (using Insert/Delete keys).  To send bank/program
+			change at startup, use <option>-b</option> and <option>-p</option> parameters.  To automatically
+			send bank/program change after reconnect, use the <option>-u</option> option.
+		</para>
+	</refsect1>
+
+	<refsect1>
+		<title>PIANOLA MODE</title>
+		<para>
+			In addition to the MIDI output port, <command>jack-keyboard</command> also opens MIDI input (listening) port.
+			MIDI events going into this port will be passed to the output port unmodified, except for channel number,
+			which will be set to the one <command>jack-keyboard</command> is configured to use.  Note On and Note Off
+			MIDI events will cause visible effect (pressing and releasing) on keys, just like if they were being pressed
+			using keyboard or mouse.
+		</para>
+		<para>
+			<command>jack-keyboard</command> will never connect to it's own MIDI input port.  It will also refuse
+			to connect to any other client whose name begins with "jack-keyboard", unless the "-k" option is given.
+			It is, however, possible to connect these ports manually, using <command>jack_connect</command>
+			or <command>qjackctl</command>; this may create feedback loop.
+		</para>
+	</refsect1>
+
+	<refsect1>
+		<title>SEE ALSO</title>
+		<para>
+			<citerefentry><refentrytitle>jackd</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+			<citerefentry><refentrytitle>ghostess</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+			<citerefentry><refentrytitle>qjackctl</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+		</para>
+	</refsect1>
+
+	<refsect1>
+		<title>BUGS</title>
+		<para>
+			Key grabbing is unreliable.
+		</para>
+
+		<para>
+			Many PC keyboards have problems with polyphony.  For example, with the one I'm using right now,
+			it's impossible to press "c", "v" and "b" at the same time.  It's a hardware problem, not the
+			software one.
+		</para>
+
+		<para>
+			The spin widgets used to set channel/bank/program number don't take focus, so the value cannot be entered
+			into them in the usual way.  It's because <command>jack-keyboard</command> already uses numeric keys
+			for different purposes.  You can still directly enter channel/bank/program in a way described above.
+		</para>
+	</refsect1>
+</refentry>
+
