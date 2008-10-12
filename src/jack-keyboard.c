@@ -155,9 +155,9 @@ void queue_message(struct MidiMessage *ev);
 double 
 get_time(void)
 {
-	double		seconds;
-	int		ret;
-	struct timeval	tv;
+	double seconds;
+	int ret;
+	struct timeval tv;
 
 	ret = gettimeofday(&tv, NULL);
 
@@ -168,22 +168,22 @@ get_time(void)
 
 	seconds = tv.tv_sec + tv.tv_usec / 1000000.0;
 
-	return seconds;
+	return (seconds);
 }
 
 double
 get_delta_time(void)
 {
-	static double	previously = -1.0;
-	double		now;
-	double		delta;
+	static double previously = -1.0;
+	double now;
+	double delta;
 
 	now = get_time();
 
 	if (previously == -1.0) {
 		previously = now;
 
-		return 0;
+		return (0);
 	}
 
 	delta = now - previously;
@@ -191,13 +191,13 @@ get_delta_time(void)
 
 	assert(delta >= 0.0);
 
-	return delta;
+	return (delta);
 }
 
 gboolean
 process_received_message_async(gpointer evp)
 {
-	int		i;
+	int i;
 	struct MidiMessage *ev = (struct MidiMessage *)evp;
 
 	if (ev->data[0] == MIDI_RESET || (ev->data[0] == MIDI_CONTROLLER &&
@@ -218,7 +218,7 @@ process_received_message_async(gpointer evp)
 
 	queue_message(ev);
 
-	return FALSE;
+	return (FALSE);
 }
 
 struct MidiMessage *
@@ -228,7 +228,7 @@ midi_message_from_midi_event(jack_midi_event_t event)
 
 	if (ev == NULL) {
 		perror("malloc");
-		return NULL;
+		return (NULL);
 	}
 
 	assert(event.size >= 1 && event.size <= 3);
@@ -238,7 +238,7 @@ midi_message_from_midi_event(jack_midi_event_t event)
 
 	memcpy(ev->data, event.buffer, ev->len);
 
-	return ev;
+	return (ev);
 }
 
 gboolean
@@ -248,7 +248,7 @@ warning_async(gpointer s)
 
 	g_warning(str);
 
-	return FALSE;
+	return (FALSE);
 }
 
 void
@@ -260,8 +260,8 @@ warn_from_jack_thread_context(const char *str)
 void
 process_midi_input(jack_nframes_t nframes)
 {
-	int		read, events, i;
-	void           *port_buffer;
+	int read, events, i;
+	void *port_buffer;
 	jack_midi_event_t event;
 
 	port_buffer = jack_port_get_buffer(input_port, nframes);
@@ -313,16 +313,16 @@ nframes_to_ms(jack_nframes_t nframes)
 
 	assert(sr > 0);
 
-	return (nframes * 1000.0) / (double)sr;
+	return ((nframes * 1000.0) / (double)sr);
 }
 
 void
 process_midi_output(jack_nframes_t nframes)
 {
-	int		read, t, bytes_remaining;
-	unsigned char  *buffer;
-	void           *port_buffer;
-	jack_nframes_t	last_frame_time;
+	int read, t, bytes_remaining;
+	unsigned char *buffer;
+	void *port_buffer;
+	jack_nframes_t last_frame_time;
 	struct MidiMessage ev;
 
 	last_frame_time = jack_last_frame_time(jack_client);
@@ -393,9 +393,8 @@ int
 process_callback(jack_nframes_t nframes, void *notused)
 {
 #ifdef MEASURE_TIME
-	if (get_delta_time() > MAX_TIME_BETWEEN_CALLBACKS) {
+	if (get_delta_time() > MAX_TIME_BETWEEN_CALLBACKS)
 		warn_from_jack_thread_context("Had to wait too long for JACK callback; scheduling problem?");
-	}
 #endif
 
 	/* Check for impossible condition that actually happened to me, caused by some problem between jackd and OSS4. */
@@ -408,18 +407,17 @@ process_callback(jack_nframes_t nframes, void *notused)
 	process_midi_output(nframes);
 
 #ifdef MEASURE_TIME
-	if (get_delta_time() > MAX_PROCESSING_TIME) {
+	if (get_delta_time() > MAX_PROCESSING_TIME)
 		warn_from_jack_thread_context("Processing took too long; scheduling problem?");
-	}
 #endif
 
-	return 0;
+	return (0);
 }
 
 void
 queue_message(struct MidiMessage *ev)
 {
-	int		written;
+	int written;
 
 	if (jack_ringbuffer_write_space(ringbuffer) < sizeof(*ev)) {
 		g_critical("Not enough space in the ringbuffer, NOTE LOST.");
@@ -468,12 +466,12 @@ queue_new_message(int b0, int b1, int b2)
 gboolean
 update_connected_to_combo_async(gpointer notused)
 {
-	int		i, count = 0;
-	const char	**connected, **available, *my_name;
-	GtkTreeIter	iter;
+	int i, count = 0;
+	const char **connected, **available, *my_name;
+	GtkTreeIter iter;
 
 	if (jack_client == NULL || output_port == NULL)
-		return FALSE;
+		return (FALSE);
 
 	connected = jack_port_get_connections(output_port);
 	available = jack_get_ports(jack_client, NULL, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput);
@@ -489,7 +487,7 @@ update_connected_to_combo_async(gpointer notused)
 
 		for (i = 0; available[i] != NULL; i++) {
 			if (!strcmp(available[i], my_name) || (!allow_connecting_to_own_kind &&
-				!strncmp(available[i], my_name, strlen(PACKAGE_NAME))))
+			    !strncmp(available[i], my_name, strlen(PACKAGE_NAME))))
 
 				continue;
 
@@ -513,15 +511,15 @@ update_connected_to_combo_async(gpointer notused)
 
 	free(available);
 
-	return FALSE;
+	return (FALSE);
 }
 
 void 
 draw_window_title(void)
 {
-	int		i, off = 0;
-	char		title[256];
-	const char    **connected_ports;
+	int i, off = 0;
+	char title[256];
+	const char **connected_ports;
 
 	if (window == NULL)
 		return;
@@ -530,7 +528,7 @@ draw_window_title(void)
 		connected_ports = jack_port_get_connections(output_port);
 
 		off += snprintf(title, sizeof(title) - off, "%s: channel %d, bank %d, program %d",
-				jack_get_client_name(jack_client), channel + 1, bank, program);
+		    jack_get_client_name(jack_client), channel + 1, bank, program);
 
 		if (!program_change_was_sent)
 			off += snprintf(title + off, sizeof(title) - off, " (bank/program change not sent)");
@@ -543,7 +541,7 @@ draw_window_title(void)
 
 			for (i = 0; connected_ports[i] != NULL; i++) {
 				off += snprintf(title + off, sizeof(title) - off, "%s%s",
-					    i == 0 ? "" : ", ", connected_ports[i]);
+				    i == 0 ? "" : ", ", connected_ports[i]);
 			}
 		}
 
@@ -566,7 +564,7 @@ update_window_title_async(gpointer notused)
 	if (window != NULL)
 		draw_window_title();
 
-	return FALSE;
+	return (FALSE);
 }
 
 int 
@@ -575,7 +573,7 @@ graph_order_callback(void *notused)
 	g_idle_add(update_window_title_async, NULL);
 	g_idle_add(update_connected_to_combo_async, NULL);
 
-	return 0;
+	return (0);
 }
 
 void
@@ -598,25 +596,25 @@ connect_to_input_port(const char *port)
         int ret;
 
 	if (!strcmp(port, jack_port_name(input_port)))
-		return -1;
+		return (-1);
 
 	if (!allow_connecting_to_own_kind) {
 		if (!strncmp(port, jack_port_name(input_port), strlen(PACKAGE_NAME)))
-			return -2;
+			return (-2);
 	}
 
         ret = jack_port_disconnect(jack_client, output_port);
         if (ret) {
                 g_warning("Cannot disconnect MIDI port.");
 
-                return -3;
+                return (-3);
         }
 
         ret = jack_connect(jack_client, jack_port_name(output_port), port);
         if (ret) {
                 g_warning("Cannot connect to %s.", port);
 
-                return -4;
+                return (-4);
         } 
 
 	g_warning("Connected to %s.", port);
@@ -630,16 +628,16 @@ connect_to_input_port(const char *port)
 
 	send_program_change_once = 0;
 
-	return 0;
+	return (0);
 }
 
 void
 connect_to_another_input_port(int up_not_down)
 {
-	const char    **available_midi_ports;
-	const char    **connected_ports;
-	const char     *current = NULL;
-	int		i, max, current_index;
+	const char **available_midi_ports;
+	const char **connected_ports;
+	const char *current = NULL;
+	int i, max, current_index;
 
 	available_midi_ports = jack_get_ports(jack_client, NULL, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput);
 
@@ -655,7 +653,7 @@ connect_to_another_input_port(int up_not_down)
 	/* Only one input port - our own. */
 	if (max == 0) {
 		g_warning("No listening JACK MIDI input ports found.  "
-			"Run some softsynth and press Insert or Delete key.");
+		    "Run some softsynth and press Insert or Delete key.");
 
 		return;
 	}
@@ -802,9 +800,9 @@ init_jack(void)
 void
 load_config_from_lash(void)
 {
-	lash_config_t	*config;
-	const char	*key;
-	int		value;
+	lash_config_t *config;
+	const char *key;
+	int value;
 
 	while ((config = lash_get_config(lash_client))) {
 		
@@ -904,35 +902,32 @@ save_config_into_lash(void)
 gboolean
 lash_callback(gpointer notused)
 {
-	lash_event_t	*event;
+	lash_event_t *event;
 
 	while ((event = lash_get_event(lash_client))) {
 		switch (lash_event_get_type(event)) {
-			case LASH_Restore_Data_Set:
-				load_config_from_lash();
-				lash_send_event(lash_client, event);
+		case LASH_Restore_Data_Set:
+			load_config_from_lash();
+			lash_send_event(lash_client, event);
+			break;
 
-				break;
+		case LASH_Save_Data_Set:
+			save_config_into_lash();
+			lash_send_event(lash_client, event);
+			break;
 
-			case LASH_Save_Data_Set:
-				save_config_into_lash();
-				lash_send_event(lash_client, event);
+		case LASH_Quit:
+			g_warning("Exiting due to LASH request.");
+			exit(EX_OK);
+			break;
 
-				break;
-
-			case LASH_Quit:
-				g_warning("Exiting due to LASH request.");
-				exit(EX_OK);
-
-				break;
-
-			default:
-				g_warning("Receieved unknown LASH event of type %d.", lash_event_get_type(event));
-				lash_event_destroy(event);
+		default:
+			g_warning("Receieved unknown LASH event of type %d.", lash_event_get_type(event));
+			lash_event_destroy(event);
 		}
 	}
 
-	return TRUE;
+	return (TRUE);
 }
 
 void
@@ -965,7 +960,7 @@ sustain_event_handler(GtkToggleButton *widget, gpointer pressed)
 		piano_keyboard_sustain_release(keyboard);
 	}
 
-	return FALSE;
+	return (FALSE);
 }
 
 void
@@ -997,9 +992,9 @@ program_event_handler(GtkSpinButton *spinbutton, gpointer notused)
 void
 connected_to_event_handler (GtkComboBox *widget, gpointer notused)
 {
-	GtkTreeIter	iter;
-	gchar		*connect_to;
-	const char	**connected_ports;
+	GtkTreeIter iter;
+	gchar *connect_to;
+	const char **connected_ports;
 
 	if (gtk_combo_box_get_active_iter(GTK_COMBO_BOX(connected_to_combo), &iter) == FALSE)
 		return;
@@ -1031,19 +1026,19 @@ int grab_x_error_handler(Display *dpy, XErrorEvent *notused)
 {
 	keyboard_grabbed = 0;
 
-	return 42;  /* Returned value is ignored. */
+	return (42);  /* Returned value is ignored. */
 }
 
 GdkFilterReturn
 keyboard_grab_filter(GdkXEvent *xevent, GdkEvent *event, gpointer notused)
 {
-	XEvent		*xe;
-	XKeyEvent	*xke;
+	XEvent *xe;
+	XKeyEvent *xke;
 
 	xe = (XEvent *)xevent;
 
 	if (xe->type != KeyPress && xe->type != KeyRelease)
-		return GDK_FILTER_CONTINUE;
+		return (GDK_FILTER_CONTINUE);
 
 	xke = (XKeyEvent *)xevent;
 
@@ -1051,7 +1046,7 @@ keyboard_grab_filter(GdkXEvent *xevent, GdkEvent *event, gpointer notused)
 	   GDK would discard it. */
 	xke->window = GDK_WINDOW_XWINDOW(window->window);
 
-	return GDK_FILTER_CONTINUE;
+	return (GDK_FILTER_CONTINUE);
 }
 
 void
@@ -1167,7 +1162,7 @@ octave_event_handler(GtkSpinButton *spinbutton, gpointer notused)
 void 
 panic(void)
 {
-	int		i;
+	int i;
 
 	/*
 	 * These two have to be sent first, in case we have no room in the
@@ -1216,73 +1211,73 @@ maybe_add_digit(GdkEventKey *event)
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(0);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_1 || event->keyval == GDK_KP_End) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(1);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_2 || event->keyval == GDK_KP_Down) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(2);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_3 || event->keyval == GDK_KP_Page_Down) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(3);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_4 || event->keyval == GDK_KP_Left) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(4);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_5 || event->keyval == GDK_KP_Begin) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(5);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_6 || event->keyval == GDK_KP_Right) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(6);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_7 || event->keyval == GDK_KP_Home) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(7);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_8 || event->keyval == GDK_KP_Up) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(8);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_9 || event->keyval == GDK_KP_Page_Up) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(9);
 
-		return TRUE;
+		return (TRUE);
 	}
 
-	return FALSE;
+	return (FALSE);
 }
 
 int
@@ -1294,7 +1289,7 @@ get_entered_number(void)
 
 	entered_number = -1;
 
-	return tmp;
+	return (tmp);
 }
 
 int
@@ -1306,14 +1301,14 @@ clip(int val, int lo, int hi)
 	if (val > hi)
 		val = hi;
 
-	return val;
+	return (val);
 }
 
 gint 
 keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 {
-	int		tmp;
-	gboolean	retval = FALSE;
+	int tmp;
+	gboolean retval = FALSE;
 
 	/* Pass signal to piano_keyboard widget.  Is there a better way to do this? */
 	if (event->type == GDK_KEY_PRESS)
@@ -1322,11 +1317,11 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 		g_signal_emit_by_name(keyboard, "key-release-event", event, &retval);
 
 	if (retval)
-		return TRUE;
+		return (TRUE);
 
 
 	if (maybe_add_digit(event))
-		return TRUE;
+		return (TRUE);
 
 	/*
 	 * '+' key shifts octave up. '-' key shifts octave down.
@@ -1335,14 +1330,14 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 		if (event->type == GDK_KEY_PRESS && octave < OCTAVE_MAX)
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(octave_spin), octave + 1);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_Subtract || event->keyval == GDK_minus) {
 		if (event->type == GDK_KEY_PRESS && octave > OCTAVE_MIN)
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(octave_spin), octave - 1);
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	/*
@@ -1359,7 +1354,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(program_spin), clip(tmp, PROGRAM_MIN, PROGRAM_MAX));
 		}
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_KP_Divide) {
@@ -1373,7 +1368,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(program_spin), clip(tmp, PROGRAM_MIN, PROGRAM_MAX));
 		}
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	/*
@@ -1390,7 +1385,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(bank_spin), clip(tmp, BANK_MIN, BANK_MAX));
 		}
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_Page_Down) {
@@ -1404,7 +1399,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(bank_spin), clip(tmp, BANK_MIN, BANK_MAX));
 		}
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	/*
@@ -1421,7 +1416,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(channel_spin), clip(tmp, CHANNEL_MIN, CHANNEL_MAX));
 		}
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_End) {
@@ -1435,7 +1430,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(channel_spin), clip(tmp, CHANNEL_MIN, CHANNEL_MAX));
 		}
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	/*
@@ -1445,21 +1440,21 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 		if (event->type == GDK_KEY_PRESS)
 			connect_to_next_input_port();
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_Delete) {
 		if (event->type == GDK_KEY_PRESS)
 			connect_to_prev_input_port();
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	if (event->keyval == GDK_Escape) {
 		if (event->type == GDK_KEY_PRESS)
 			panic();
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	/*
@@ -1475,7 +1470,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 		else
 			gtk_button_released(GTK_BUTTON(sustain_button));
 
-		return TRUE;
+		return (TRUE);
 	}
 
 	/*
@@ -1490,7 +1485,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 
 		gtk_range_set_value(GTK_RANGE(velocity_hscale), *current_velocity);
 
-		return TRUE;
+		return (TRUE);
 
 	}
 
@@ -1502,10 +1497,10 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 
 		gtk_range_set_value(GTK_RANGE(velocity_hscale), *current_velocity);
 
-		return TRUE;
+		return (TRUE);
 	}
 
-	return FALSE;
+	return (FALSE);
 }
 
 void
@@ -1527,8 +1522,8 @@ note_off_event_handler(GtkWidget *widget, int note)
 void
 init_gtk_1(int *argc, char ***argv)
 {
-	GdkPixbuf	*icon = NULL;
-	GError		*error = NULL;
+	GdkPixbuf *icon = NULL;
+	GError *error = NULL;
 
 	gtk_init(argc, argv);
 
@@ -1544,15 +1539,15 @@ init_gtk_1(int *argc, char ***argv)
 
 	/* Window. */
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_container_set_border_width (GTK_CONTAINER (window), 2);
+	gtk_container_set_border_width(GTK_CONTAINER(window), 2);
 }
 
 void
 init_gtk_2(void)
 {
-	GtkTable	*table;
-	GtkWidget	*label;
-	GtkCellRenderer	*renderer;
+	GtkTable *table;
+	GtkWidget *label;
+	GtkCellRenderer *renderer;
 
 	/* Table. */
 	table = GTK_TABLE(gtk_table_new(4, 8, FALSE));
@@ -1724,104 +1719,104 @@ main(int argc, char *argv[])
 
 	while ((ch = getopt(argc, argv, "CGKTVa:nktur:c:b:p:l:")) != -1) {
 		switch (ch) {
-			case 'C':
-				enable_keyboard_cue = 1;
-				break;
+		case 'C':
+			enable_keyboard_cue = 1;
+			break;
 
-			case 'G':
-				enable_gui = 0;
-				enable_window_title = !enable_window_title;
-				break;
+		case 'G':
+			enable_gui = 0;
+			enable_window_title = !enable_window_title;
+			break;
 
-			case 'K':
-				grab_keyboard_at_startup = 1;
-				break;
+		case 'K':
+			grab_keyboard_at_startup = 1;
+			break;
 
-			case 'T':
-				enable_window_title = !enable_window_title;
-				break;
+		case 'T':
+			enable_window_title = !enable_window_title;
+			break;
 
-			case 'V':
-				show_version();
-				break;
+		case 'V':
+			show_version();
+			break;
 
-			case 'a':
-				autoconnect_port_name = strdup(optarg);
-				break;
+		case 'a':
+			autoconnect_port_name = strdup(optarg);
+			break;
 
-			case 'n':
-				/* Do nothing; backward compatibility. */
-				break;
+		case 'n':
+			/* Do nothing; backward compatibility. */
+			break;
 
-			case 'k':
-				allow_connecting_to_own_kind = 1;
-				break;
+		case 'k':
+			allow_connecting_to_own_kind = 1;
+			break;
 
-			case 'l':
-				keyboard_layout = strdup(optarg);
-				break;
-				
-			case 't':
-				time_offsets_are_zero = 1;
-				break;
-				
-			case 'u':
-				send_program_change_at_reconnect = 1;
-				break;
+		case 'l':
+			keyboard_layout = strdup(optarg);
+			break;
+			
+		case 't':
+			time_offsets_are_zero = 1;
+			break;
+			
+		case 'u':
+			send_program_change_at_reconnect = 1;
+			break;
 
-			case 'c':
-				initial_channel = atoi(optarg);
+		case 'c':
+			initial_channel = atoi(optarg);
 
-				if (initial_channel < CHANNEL_MIN || initial_channel > CHANNEL_MAX) {
-					g_critical("Invalid MIDI channel number specified on the command line; "
-						"valid values are %d-%d.", CHANNEL_MIN, CHANNEL_MAX);
+			if (initial_channel < CHANNEL_MIN || initial_channel > CHANNEL_MAX) {
+				g_critical("Invalid MIDI channel number specified on the command line; "
+					"valid values are %d-%d.", CHANNEL_MIN, CHANNEL_MAX);
 
-					exit(EX_USAGE);
-				}
+				exit(EX_USAGE);
+			}
 
-				break;
+			break;
 
-			case 'b':
-				initial_bank = atoi(optarg);
+		case 'b':
+			initial_bank = atoi(optarg);
 
-				send_program_change_once = 1;
+			send_program_change_once = 1;
 
-				if (initial_bank < BANK_MIN || initial_bank > BANK_MAX) {
-					g_critical("Invalid MIDI bank number specified on the command line; "
-						"valid values are %d-%d.", BANK_MIN, BANK_MAX);
+			if (initial_bank < BANK_MIN || initial_bank > BANK_MAX) {
+				g_critical("Invalid MIDI bank number specified on the command line; "
+					"valid values are %d-%d.", BANK_MIN, BANK_MAX);
 
-					exit(EX_USAGE);
-				}
+				exit(EX_USAGE);
+			}
 
-				break;
-	
-			case 'p':
-				initial_program = atoi(optarg);
+			break;
 
-				send_program_change_once = 1;
+		case 'p':
+			initial_program = atoi(optarg);
 
-				if (initial_program < PROGRAM_MIN || initial_program > PROGRAM_MAX) {
-					g_critical("Invalid MIDI program number specified on the command line; "
-						"valid values are %d-%d.", PROGRAM_MIN, PROGRAM_MAX);
+			send_program_change_once = 1;
 
-					exit(EX_USAGE);
-				}
+			if (initial_program < PROGRAM_MIN || initial_program > PROGRAM_MAX) {
+				g_critical("Invalid MIDI program number specified on the command line; "
+					"valid values are %d-%d.", PROGRAM_MIN, PROGRAM_MAX);
 
-				break;
+				exit(EX_USAGE);
+			}
 
-			case 'r':
-				rate_limit = strtod(optarg, NULL);
-				if (rate_limit <= 0.0) {
-					g_critical("Invalid rate limit specified.\n");
+			break;
 
-					exit(EX_USAGE);
-				}
+		case 'r':
+			rate_limit = strtod(optarg, NULL);
+			if (rate_limit <= 0.0) {
+				g_critical("Invalid rate limit specified.\n");
 
-				break;
+				exit(EX_USAGE);
+			}
 
-			case '?':
-			default:
-				usage();
+			break;
+
+		case '?':
+		default:
+			usage();
 		}
 	}
 
@@ -1860,6 +1855,6 @@ main(int argc, char *argv[])
 
 	gtk_main();
 
-	return 0;
+	return (0);
 }
 
