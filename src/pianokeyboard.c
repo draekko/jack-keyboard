@@ -52,37 +52,44 @@ static guint	piano_keyboard_signals[LAST_SIGNAL] = { 0 };
 static void
 draw_keyboard_cue(PianoKeyboard *pk)
 {
-	int		w = pk->notes[0].w;
-	int		h = pk->notes[0].h;
+	int w, h, first_note_in_lower_row, last_note_in_lower_row,
+	    first_note_in_higher_row, last_note_in_higher_row;
 
-	GdkGC          *gc = GTK_WIDGET(pk)->style->fg_gc[0];
+	GdkGC *gc;
 
-	int		first_note_in_lower_row = (pk->octave + 5) * 12;
-	int		last_note_in_lower_row = (pk->octave + 6) * 12 - 1;
-	int		first_note_in_higher_row = (pk->octave + 6) * 12;
-	int		last_note_in_higher_row = (pk->octave + 7) * 12 + 4;
+	w = pk->notes[0].w;
+	h = pk->notes[0].h;
+
+	gc = GTK_WIDGET(pk)->style->fg_gc[0];
+
+	first_note_in_lower_row = (pk->octave + 5) * 12;
+	last_note_in_lower_row = (pk->octave + 6) * 12 - 1;
+	first_note_in_higher_row = (pk->octave + 6) * 12;
+	last_note_in_higher_row = (pk->octave + 7) * 12 + 4;
 
 	gdk_draw_line(GTK_WIDGET(pk)->window, gc, pk->notes[first_note_in_lower_row].x + 3,
-			h - 6, pk->notes[last_note_in_lower_row].x + w - 3, h - 6);
+	    h - 6, pk->notes[last_note_in_lower_row].x + w - 3, h - 6);
 
 	gdk_draw_line(GTK_WIDGET(pk)->window, gc, pk->notes[first_note_in_higher_row].x + 3,
-			h - 9, pk->notes[last_note_in_higher_row].x + w - 3, h - 9);
+	    h - 9, pk->notes[last_note_in_higher_row].x + w - 3, h - 9);
 }
 
 static void 
 draw_note(PianoKeyboard *pk, int note)
 {
-	GdkColor	black = {0, 0, 0, 0};
-	GdkColor	white = {0, 65535, 65535, 65535};
+	int is_white, x, w, h;
 
-	GdkGC		*gc = GTK_WIDGET(pk)->style->fg_gc[0];
-	GtkWidget	*widget;
+	GdkColor black = {0, 0, 0, 0};
+	GdkColor white = {0, 65535, 65535, 65535};
 
-	int		is_white = pk->notes[note].white;
+	GdkGC *gc = GTK_WIDGET(pk)->style->fg_gc[0];
+	GtkWidget *widget;
 
-	int		x = pk->notes[note].x;
-	int		w = pk->notes[note].w;
-	int		h = pk->notes[note].h;
+	is_white = pk->notes[note].white;
+
+	x = pk->notes[note].x;
+	w = pk->notes[note].w;
+	h = pk->notes[note].h;
 
 	if (pk->notes[note].pressed || pk->notes[note].sustained)
 		is_white = !is_white;
@@ -113,8 +120,9 @@ draw_note(PianoKeyboard *pk, int note)
 	 * that didn't work.
 	 */
 	widget = GTK_WIDGET(pk);
-	gtk_paint_shadow(widget->style, widget->window, GTK_STATE_NORMAL, GTK_SHADOW_IN, NULL, widget, NULL, pk->widget_margin, 0,
-		widget->allocation.width - pk->widget_margin * 2 + 1, widget->allocation.height);
+	gtk_paint_shadow(widget->style, widget->window, GTK_STATE_NORMAL, GTK_SHADOW_IN, NULL,
+	    widget, NULL, pk->widget_margin, 0, widget->allocation.width - pk->widget_margin * 2 + 1,
+	    widget->allocation.height);
 }
 
 static int 
@@ -127,7 +135,7 @@ press_key(PianoKeyboard *pk, int key)
 
 	/* This is for keyboard autorepeat protection. */
 	if (pk->notes[key].pressed)
-		return 0;
+		return (0);
 
 	if (pk->sustain_new_notes)
 		pk->notes[key].sustained = 1;
@@ -139,7 +147,7 @@ press_key(PianoKeyboard *pk, int key)
 	g_signal_emit_by_name(GTK_WIDGET(pk), "note-on", key);
 	draw_note(pk, key);
 
-	return 1;
+	return (1);
 }
 
 static int 
@@ -151,7 +159,7 @@ release_key(PianoKeyboard *pk, int key)
 	pk->maybe_stop_sustained_notes = 0;
 
 	if (!pk->notes[key].pressed)
-		return 0;
+		return (0);
 
 	if (pk->sustain_new_notes)
 		pk->notes[key].sustained = 1;
@@ -159,18 +167,18 @@ release_key(PianoKeyboard *pk, int key)
 	pk->notes[key].pressed = 0;
 
 	if (pk->notes[key].sustained)
-		return 0;
+		return (0);
 
 	g_signal_emit_by_name(GTK_WIDGET(pk), "note-off", key);
 	draw_note(pk, key);
 
-	return 1;
+	return (1);
 }
 
 static void 
 stop_unsustained_notes(PianoKeyboard *pk)
 {
-	int		i;
+	int i;
 
 	for (i = 0; i < NNOTES; i++) {
 		if (pk->notes[i].pressed && !pk->notes[i].sustained) {
@@ -184,7 +192,7 @@ stop_unsustained_notes(PianoKeyboard *pk)
 static void 
 stop_sustained_notes(PianoKeyboard *pk)
 {
-	int		i;
+	int i;
 
 	for (i = 0; i < NNOTES; i++) {
 		if (pk->notes[i].sustained) {
@@ -207,9 +215,9 @@ key_binding(PianoKeyboard *pk, const char *key)
 	found = g_hash_table_lookup_extended(pk->key_bindings, key, &notused, &note);
 
 	if (!found)
-		return -1;
+		return (-1);
 
-	return (int)note;
+	return ((int)note);
 }
 
 static void
@@ -323,11 +331,11 @@ bind_keys_azerty(PianoKeyboard *pk)
 static gint 
 keyboard_event_handler(GtkWidget *mk, GdkEventKey *event, gpointer notused)
 {
-	int		note;
-	char		*key;
-	guint		keyval;
-	GdkKeymapKey	kk;
-	PianoKeyboard	*pk = PIANO_KEYBOARD(mk);
+	int note;
+	char *key;
+	guint keyval;
+	GdkKeymapKey kk;
+	PianoKeyboard *pk = PIANO_KEYBOARD(mk);
 
 	/* We're not using event->keyval, because we need keyval with level set to 0.
 	   E.g. if user holds Shift and presses '7', we want to get a '7', not '&'. */
@@ -341,14 +349,14 @@ keyboard_event_handler(GtkWidget *mk, GdkEventKey *event, gpointer notused)
 
 	if (key == NULL) {
 		g_message("gtk_keyval_name() returned NULL; please report this.");
-		return FALSE;
+		return (FALSE);
 	}
 
 	note = key_binding(pk, key);
 
 	if (note < 0) {
 		/* Key was not bound.  Maybe it's one of the keys handled in jack-keyboard.c. */
-		return FALSE;
+		return (FALSE);
 	}
 
 	note += pk->octave * 12;
@@ -363,14 +371,15 @@ keyboard_event_handler(GtkWidget *mk, GdkEventKey *event, gpointer notused)
 		release_key(pk, note);
 	}
 
-	return TRUE;
+	return (TRUE);
 }
 
 static int 
 get_note_for_xy(PianoKeyboard *pk, int x, int y)
 {
-	int		height = GTK_WIDGET(pk)->allocation.height;
-	int		note;
+	int height, note;
+
+	height = GTK_WIDGET(pk)->allocation.height;
 
 	if (y <= height / 2) {
 		for (note = 0; note < NNOTES - 1; note++) {
@@ -378,7 +387,7 @@ get_note_for_xy(PianoKeyboard *pk, int x, int y)
 				continue;
 
 			if (x >= pk->notes[note].x && x <= pk->notes[note].x + pk->notes[note].w)
-				return note;
+				return (note);
 		}
 	}
 
@@ -387,28 +396,30 @@ get_note_for_xy(PianoKeyboard *pk, int x, int y)
 			continue;
 
 		if (x >= pk->notes[note].x && x <= pk->notes[note].x + pk->notes[note].w)
-			return note;
+			return (note);
 	}
 
-	return -1;
+	return (-1);
 }
 
 static gboolean 
 mouse_button_event_handler(PianoKeyboard *pk, GdkEventButton *event, gpointer notused)
 {
-	int		x = event->x;
-	int		y = event->y;
+	int x, y, note;
 
-	int		note = get_note_for_xy(pk, x, y);
+	x = event->x;
+	y = event->y;
+
+	note = get_note_for_xy(pk, x, y);
 
 	if (event->button != 1)
-		return TRUE;
+		return (TRUE);
 
 	if (event->type == GDK_BUTTON_PRESS) {
 		/* This is possible when you make the window a little wider and then click
 		   on the grey area. */
 		if (note < 0) {
-			return TRUE;
+			return (TRUE);
 		}
 
 		if (pk->note_being_pressed_using_mouse >= 0)
@@ -430,16 +441,16 @@ mouse_button_event_handler(PianoKeyboard *pk, GdkEventButton *event, gpointer no
 
 	}
 
-	return TRUE;
+	return (TRUE);
 }
 
 static gboolean 
 mouse_motion_event_handler(PianoKeyboard *pk, GdkEventMotion *event, gpointer notused)
 {
-	int		note;
+	int note;
 
 	if ((event->state & GDK_BUTTON1_MASK) == 0)
-		return TRUE;
+		return (TRUE);
 
 	note = get_note_for_xy(pk, event->x, event->y);
 
@@ -451,7 +462,7 @@ mouse_motion_event_handler(PianoKeyboard *pk, GdkEventMotion *event, gpointer no
 		pk->note_being_pressed_using_mouse = note;
 	}
 
-	return TRUE;
+	return (TRUE);
 }
 
 static gboolean
@@ -463,7 +474,7 @@ piano_keyboard_expose(GtkWidget *widget, GdkEventExpose *event)
 	for (i = 0; i < NNOTES; i++)
 		draw_note(pk, i);
 
-	return TRUE;
+	return (TRUE);
 }
 
 static void 
@@ -476,18 +487,13 @@ piano_keyboard_size_request(GtkWidget *widget, GtkRequisition *requisition)
 static void
 recompute_dimensions(PianoKeyboard *pk)
 {
-	int		number_of_white_keys = (NNOTES - 1) * (7.0 / 12.0);
+	int number_of_white_keys, key_width, black_key_width, useful_width, note,
+	    white_key = 0, note_in_octave, width, height;
 
-	int		key_width;
-	int		black_key_width;
-	int		useful_width;
+	number_of_white_keys = (NNOTES - 1) * (7.0 / 12.0);
 
-	int		note;
-	int		white_key = 0;
-	int		note_in_octave;
-
-	int		width = GTK_WIDGET(pk)->allocation.width;
-	int		height = GTK_WIDGET(pk)->allocation.height;
+	width = GTK_WIDGET(pk)->allocation.width;
+	height = GTK_WIDGET(pk)->allocation.height;
 
 	key_width = width / number_of_white_keys;
 	black_key_width = key_width * 0.8;
@@ -498,7 +504,7 @@ recompute_dimensions(PianoKeyboard *pk)
 		note_in_octave = note % 12;
 
 		if (note_in_octave == 1 || note_in_octave == 3 || note_in_octave == 6 ||
-			note_in_octave == 8 || note_in_octave == 10) {
+		    note_in_octave == 8 || note_in_octave == 10) {
 
 			/* This note is black key. */
 			pk->notes[note].x = pk->widget_margin + white_key * key_width - black_key_width / 2;
@@ -530,26 +536,25 @@ piano_keyboard_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
 
 	recompute_dimensions(PIANO_KEYBOARD(widget));
 
-	if (GTK_WIDGET_REALIZED(widget)) {
+	if (GTK_WIDGET_REALIZED(widget))
 		gdk_window_move_resize (widget->window, allocation->x, allocation->y, allocation->width, allocation->height);
-	}
 }
 
 static void
 piano_keyboard_class_init(PianoKeyboardClass *klass)
 {
-	GtkWidgetClass	*widget_klass;
+	GtkWidgetClass *widget_klass;
 
 	/* Set up signals. */
 	piano_keyboard_signals[NOTE_ON_SIGNAL] = g_signal_new ("note-on",
-		G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-		0, NULL, NULL, g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
+	    G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
+	    0, NULL, NULL, g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
 
 	piano_keyboard_signals[NOTE_OFF_SIGNAL] = g_signal_new ("note-off",
-		G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-		0, NULL, NULL, g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
+	    G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
+	    0, NULL, NULL, g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
 
-	widget_klass = (GtkWidgetClass*) klass;	
+	widget_klass = (GtkWidgetClass*)klass;	
 
 	widget_klass->expose_event = piano_keyboard_expose;
 	widget_klass->size_request = piano_keyboard_size_request;
@@ -589,15 +594,17 @@ piano_keyboard_get_type(void)
 		mk_type = g_type_register_static(GTK_TYPE_DRAWING_AREA, "PianoKeyboard", &mk_info, 0);
 	}
 
-	return mk_type;
+	return (mk_type);
 }
 
 GtkWidget *
 piano_keyboard_new(void)
 {
-	GtkWidget *widget = gtk_type_new(piano_keyboard_get_type());
+	GtkWidget *widget;
+	PianoKeyboard *pk;
 
-	PianoKeyboard *pk = PIANO_KEYBOARD(widget);
+	widget = gtk_type_new(piano_keyboard_get_type());
+	pk = PIANO_KEYBOARD(widget);
 
 	pk->maybe_stop_sustained_notes = 0;
 	pk->sustain_new_notes = 0;
@@ -608,7 +615,7 @@ piano_keyboard_new(void)
 	pk->key_bindings = g_hash_table_new(g_str_hash, g_str_equal);
 	bind_keys_qwerty(pk);
 
-	return widget;
+	return (widget);
 }
 
 void
@@ -678,9 +685,9 @@ piano_keyboard_set_keyboard_layout(PianoKeyboard *pk, const char *layout)
 
 	} else {
 		/* Unknown layout name. */
-		return TRUE;
+		return (TRUE);
 	}
 
-	return FALSE;
+	return (FALSE);
 }
 
