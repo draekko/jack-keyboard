@@ -1691,7 +1691,7 @@ usage(void)
 	fprintf(stderr, "   where <channel> is MIDI channel to use for output, from 1 to 16,\n");
 	fprintf(stderr, "   <bank> is MIDI bank to use, from 0 to 16383,\n");
 	fprintf(stderr, "   <program> is MIDI program to use, from 0 to 127,\n");
-	fprintf(stderr, "   and <layout> is either QWERTY, QWERTZ or AZERTY.\n");
+	fprintf(stderr, "   and <layout> is  QWERTY, QWERTZ, AZERTY or DVORAK.\n");
 	fprintf(stderr, "See manual page for details.\n");
 
 	exit(EX_USAGE);
@@ -1829,7 +1829,7 @@ main(int argc, char *argv[])
 		int ret = piano_keyboard_set_keyboard_layout(keyboard, keyboard_layout);
 
 		if (ret) {
-			g_critical("Invalid layout, proper choices are QWERTY, QWERTZ and AZERTY.");
+			g_critical("Invalid layout, proper choices are QWERTY, QWERTZ, AZERTY and DVORAK.");
 			exit(EX_USAGE);
 		}
 	}

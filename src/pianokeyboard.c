@@ -328,6 +328,56 @@ bind_keys_azerty(PianoKeyboard *pk)
 	bind_key(pk, "p", 40);
 }
 
+static void 
+bind_keys_dvorak(PianoKeyboard *pk)
+{
+	clear_notes(pk);
+
+	/* Lower keyboard row - ";qjkxbm". */
+	bind_key(pk, "semicolon", 12); /* C0 */
+	bind_key(pk, "o", 13);
+	bind_key(pk, "q", 14);
+	bind_key(pk, "e", 15);
+	bind_key(pk, "j", 16);
+	bind_key(pk, "k", 17);
+	bind_key(pk, "i", 18);
+	bind_key(pk, "x", 19);
+	bind_key(pk, "d", 20);
+	bind_key(pk, "b", 21);
+	bind_key(pk, "h", 22);
+	bind_key(pk, "m", 23);
+	bind_key(pk, "w", 24); /* overlaps with upper row */
+	bind_key(pk, "n", 25);
+	bind_key(pk, "v", 26);
+	bind_key(pk, "s", 27);
+	bind_key(pk, "z", 28);
+
+	/* Upper keyboard row, first octave - "',.pyfg". */
+	bind_key(pk, "apostrophe", 24);
+	bind_key(pk, "2", 25);
+	bind_key(pk, "comma", 26);
+	bind_key(pk, "3", 27);
+	bind_key(pk, "period", 28);
+	bind_key(pk, "p", 29);
+	bind_key(pk, "5", 30);
+	bind_key(pk, "y", 31);
+	bind_key(pk, "6", 32);
+	bind_key(pk, "f", 33);
+	bind_key(pk, "7", 34);
+	bind_key(pk, "g", 35);
+
+	/* Upper keyboard row, the rest - "crl". */
+	bind_key(pk, "c", 36);
+	bind_key(pk, "9", 37);
+	bind_key(pk, "r", 38);
+	bind_key(pk, "0", 39);
+	bind_key(pk, "l", 40);
+	bind_key(pk, "slash", 41); /* extra F */
+	bind_key(pk, "bracketright", 42);
+	bind_key(pk, "equal", 43);
+
+}
+
 static gint 
 keyboard_event_handler(GtkWidget *mk, GdkEventKey *event, gpointer notused)
 {
@@ -682,6 +732,9 @@ piano_keyboard_set_keyboard_layout(PianoKeyboard *pk, const char *layout)
 
 	} else if (!strcasecmp(layout, "AZERTY")) {
 		bind_keys_azerty(pk);
+
+	} else if (!strcasecmp(layout, "DVORAK")) {
+		bind_keys_dvorak(pk);
 
 	} else {
 		/* Unknown layout name. */
