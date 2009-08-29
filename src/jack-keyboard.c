@@ -990,7 +990,7 @@ program_event_handler(GtkSpinButton *spinbutton, gpointer notused)
 }
 
 void
-connected_to_event_handler (GtkComboBox *widget, gpointer notused)
+connected_to_event_handler(GtkComboBox *widget, gpointer notused)
 {
 	GtkTreeIter iter;
 	gchar *connect_to;
