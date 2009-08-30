@@ -111,7 +111,7 @@ lash_client_t	*lash_client;
 #define BANK_MIN		0
 #define BANK_MAX		127
 #define PROGRAM_MIN		0
-#define PROGRAM_MAX		16383
+#define PROGRAM_MAX		127
 #define CHANNEL_MIN		1
 #define CHANNEL_MAX		16
 
