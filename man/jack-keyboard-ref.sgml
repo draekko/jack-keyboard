@@ -76,7 +76,7 @@
 				<listitem>
 					<para>
 						Toggle titlebar, on which channel/bank/program information is shown.
-						With -G option, it disables titlebar; otherwise it enables it.
+						With \-G option, it disables titlebar; otherwise it enables it.
 					</para>
 				</listitem>
 			</varlistentry>
@@ -287,7 +287,7 @@
 		</para>
 		<para>
 			<command>jack-keyboard</command> will never connect to it's own MIDI input port.  It will also refuse
-			to connect to any other client whose name begins with "jack-keyboard", unless the "-k" option is given.
+			to connect to any other client whose name begins with "jack-keyboard", unless the "\-k" option is given.
 			It is, however, possible to connect these ports manually, using <command>jack_connect</command>
 			or <command>qjackctl</command>; this may create feedback loop.
 		</para>
