@@ -209,7 +209,10 @@ process_received_message_async(gpointer evp)
 	}
 
 	if (ev->data[0] == MIDI_NOTE_ON) {
-		piano_keyboard_set_note_on(keyboard, ev->data[1]);
+		if (ev->data[2] == 0)
+			piano_keyboard_set_note_off(keyboard, ev->data[1]);
+		else
+			piano_keyboard_set_note_on(keyboard, ev->data[1]);
 	}
 
 	if (ev->data[0] == MIDI_NOTE_OFF) {
