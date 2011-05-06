@@ -199,26 +199,33 @@ process_received_message_async(gpointer evp)
 {
 	int i;
 	struct MidiMessage *ev = (struct MidiMessage *)evp;
+	int b0 = ev->data[0];
+	int b1 = ev->data[1];
 
-	if (ev->data[0] == MIDI_RESET || (ev->data[0] == MIDI_CONTROLLER &&
-		(ev->data[1] == MIDI_ALL_NOTES_OFF || ev->data[1] == MIDI_ALL_SOUND_OFF))) {
+	/* Strip channel from channel messages */
+	if (b0 >= 0x80 && b0 <= 0xEF)
+		b0 = b0 & 0xF0;
+
+	if (b0 == MIDI_RESET || (b0 == MIDI_CONTROLLER &&
+		(b1 == MIDI_ALL_NOTES_OFF || b1 == MIDI_ALL_SOUND_OFF))) {
 
 		for (i = 0; i < NNOTES; i++) {
 			piano_keyboard_set_note_off(keyboard, i);
 		}
 	}
 
-	if (ev->data[0] == MIDI_NOTE_ON) {
+	if (b0 == MIDI_NOTE_ON) {
 		if (ev->data[2] == 0)
 			piano_keyboard_set_note_off(keyboard, ev->data[1]);
 		else
 			piano_keyboard_set_note_on(keyboard, ev->data[1]);
 	}
 
-	if (ev->data[0] == MIDI_NOTE_OFF) {
+	if (b0 == MIDI_NOTE_OFF) {
 		piano_keyboard_set_note_off(keyboard, ev->data[1]);
 	}
 
+	ev->data [0] = b0 | channel;
 	queue_message(ev);
 
 	return (FALSE);
