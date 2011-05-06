@@ -739,7 +739,7 @@ init_jack(void)
 	lash_event_t *event;
 #endif
 
-	jack_client = jack_client_open(PACKAGE_NAME, JackNullOption, NULL);
+	jack_client = jack_client_open(PACKAGE_NAME, JackNoStartServer, NULL);
 
 	if (jack_client == NULL) {
 		g_critical("Could not connect to the JACK server; run jackd first?");
