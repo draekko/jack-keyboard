@@ -25,7 +25,7 @@
  */
 
 /*
- * This is jack-keyboard 2.5, a virtual keyboard for JACK MIDI.
+ * This is jack-keyboard 2.6, a virtual keyboard for JACK MIDI.
  *
  * For questions and comments, contact Edward Tomasz Napierala <trasz@FreeBSD.org>.
  */
