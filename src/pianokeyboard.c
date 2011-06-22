@@ -217,11 +217,11 @@ key_binding(PianoKeyboard *pk, const char *key)
 	if (!found)
 		return (-1);
 
-	return ((int)note);
+	return ((long)note);
 }
 
 static void
-bind_key(PianoKeyboard *pk, const char *key, int note)
+bind_key(PianoKeyboard *pk, const char *key, long note)
 {
 	assert(pk->key_bindings != NULL);
 

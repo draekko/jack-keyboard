@@ -1,2 +1,0 @@
-SUBDIRS = src man pixmaps
-

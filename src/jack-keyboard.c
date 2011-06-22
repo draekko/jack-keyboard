@@ -25,9 +25,11 @@
  */
 
 /*
- * This is jack-keyboard 2.6, a virtual keyboard for JACK MIDI.
+ * jack-keyboard is a virtual keyboard for JACK MIDI.
  *
- * For questions and comments, contact Edward Tomasz Napierala <trasz@FreeBSD.org>.
+ * For questions and comments, you can contact:
+ * - Edward Tomasz Napierala <trasz@FreeBSD.org>
+ * - Hans Petter Selasky <hselasky@FreeBSD.org>.
  */
 
 #include <stdio.h>
@@ -1689,7 +1691,7 @@ log_handler(const gchar *log_domain, GLogLevelFlags log_level, const gchar *mess
 void
 show_version(void)
 {
-	fprintf(stdout, "%s\n", PACKAGE_STRING);
+	fprintf(stdout, "%s\n", PACKAGE_NAME " v" PACKAGE_VERSION);
 
 	exit(EX_OK);
 }
