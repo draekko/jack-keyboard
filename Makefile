@@ -34,6 +34,7 @@ package:
 		TODO \
 		cmake \
 		man \
+		pixmaps \
 		src
 
 	rm -rf jack-keyboard-${VERSION}
