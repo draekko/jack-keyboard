@@ -70,7 +70,7 @@
 #define OUTPUT_PORT_NAME	"midi_out"
 #define INPUT_PORT_NAME		"midi_in"
 #define PACKAGE_NAME		"jack-keyboard"
-#define PACKAGE_VERSION		"2.5"
+#define PACKAGE_VERSION		"2.6"
 
 jack_port_t	*output_port;
 jack_port_t	*input_port;
