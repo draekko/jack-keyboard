@@ -28,7 +28,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
-set(VERSION "2.6")
+set(VERSION "2.7.1")
 
 set(JackEnable ON CACHE BOOL "Enable support for Jack")
 set(LashEnable ON CACHE BOOL "Enable support for Lash")

@@ -61,8 +61,6 @@
 #include <gdk/gdkx.h>
 #endif
 
-#define NNOTES 127
-
 #define VELOCITY_MAX		127
 #define VELOCITY_HIGH		100
 #define VELOCITY_NORMAL		64
@@ -1699,11 +1697,11 @@ show_version(void)
 void
 usage(void)
 {
-	fprintf(stderr, "usage: jack-keyboard [-CGKTVktur] [ -a <input port>] [-c <channel>] [-b <bank> ] [-p <program>] [-l <layout>]\n");
+	fprintf(stderr, "usage: jack-keyboard [-CGKTVkturf] [ -a <input port>] [-c <channel>] [-b <bank> ] [-p <program>] [-l <layout>]\n");
 	fprintf(stderr, "   where <channel> is MIDI channel to use for output, from 1 to 16,\n");
 	fprintf(stderr, "   <bank> is MIDI bank to use, from 0 to 16383,\n");
 	fprintf(stderr, "   <program> is MIDI program to use, from 0 to 127,\n");
-	fprintf(stderr, "   and <layout> is  QWERTY, QWERTZ, AZERTY or DVORAK.\n");
+	fprintf(stderr, "   and <layout> is  QWERTY, QWERTY_REV, QWERTY_UK, QWERTY_UK_REV, QWERTZ, AZERTY or DVORAK.\n");
 	fprintf(stderr, "See manual page for details.\n");
 
 	exit(EX_USAGE);
@@ -1712,7 +1710,7 @@ usage(void)
 int 
 main(int argc, char *argv[])
 {
-	int ch, enable_keyboard_cue = 0, initial_channel = 1, initial_bank = 0, initial_program = 0;
+	int ch, enable_keyboard_cue = 0, initial_channel = 1, initial_bank = 0, initial_program = 0, full_midi_keyboard = 0;
 	char *keyboard_layout = NULL, *autoconnect_port_name = NULL;
 
 #ifdef HAVE_LASH
@@ -1729,7 +1727,7 @@ main(int argc, char *argv[])
 
 	g_log_set_default_handler(log_handler, NULL);
 
-	while ((ch = getopt(argc, argv, "CGKTVa:nktur:c:b:p:l:")) != -1) {
+	while ((ch = getopt(argc, argv, "CGKTVa:nktur:c:b:p:l:f")) != -1) {
 		switch (ch) {
 		case 'C':
 			enable_keyboard_cue = 1;
@@ -1826,6 +1824,10 @@ main(int argc, char *argv[])
 
 			break;
 
+		case 'f':
+			full_midi_keyboard = 1;
+			break;
+
 		case '?':
 		default:
 			usage();
@@ -1837,11 +1839,14 @@ main(int argc, char *argv[])
 
 	init_gtk_2();
 
+	if (full_midi_keyboard)
+		piano_keyboard_enable_all_midi_notes(keyboard);
+
 	if (keyboard_layout != NULL) {
 		int ret = piano_keyboard_set_keyboard_layout(keyboard, keyboard_layout);
 
 		if (ret) {
-			g_critical("Invalid layout, proper choices are QWERTY, QWERTZ, AZERTY and DVORAK.");
+			g_critical("Invalid layout, proper choices are QWERTY, QWERTY_REV, QWERTY_UK, QWERTY_UK_REV, QWERTZ, AZERTY and DVORAK.");
 			exit(EX_USAGE);
 		}
 	}

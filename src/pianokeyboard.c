@@ -77,6 +77,10 @@ draw_keyboard_cue(PianoKeyboard *pk)
 static void 
 draw_note(PianoKeyboard *pk, int note)
 {
+	if (note < pk->min_note)
+		return;
+	if (note > pk->max_note)
+		return;
 	int is_white, x, w, h;
 
 	GdkColor black = {0, 0, 0, 0};
@@ -256,7 +260,7 @@ bind_keys_qwerty(PianoKeyboard *pk)
 	bind_key(pk, "m", 23);
 
 	/* Upper keyboard row, first octave - "qwertyu". */
-	bind_key(pk, "q", 24);
+	bind_key(pk, "q", 24); /* C1 */
 	bind_key(pk, "2", 25);
 	bind_key(pk, "w", 26);
 	bind_key(pk, "3", 27);
@@ -270,11 +274,91 @@ bind_keys_qwerty(PianoKeyboard *pk)
 	bind_key(pk, "u", 35);
 
 	/* Upper keyboard row, the rest - "iop". */
-	bind_key(pk, "i", 36);
+	bind_key(pk, "i", 36); /* C2 */
 	bind_key(pk, "9", 37);
 	bind_key(pk, "o", 38);
 	bind_key(pk, "0", 39);
 	bind_key(pk, "p", 40);
+}
+
+static void 
+bind_keys_qwerty_uk(PianoKeyboard *pk)
+{
+	bind_keys_qwerty(pk);
+
+	/* Lower keyboard row - "zxcvbnm". */
+	bind_key(pk, "backslash", 11); /* B0 */
+	/* ... */
+	bind_key(pk, "comma", 24); /* C1 */
+	bind_key(pk, "l", 25);
+	bind_key(pk, "period", 26);
+	bind_key(pk, "semicolon", 27);
+	bind_key(pk, "slash", 28);
+
+	/* Upper keyboard row, the rest - "iop". */
+	bind_key(pk, "bracketleft", 41); /* F6 */
+	bind_key(pk, "equal", 42);
+	bind_key(pk, "bracketright", 43);
+}
+static void 
+bind_keys_qwerty_rev(PianoKeyboard *pk)
+{
+	clear_notes(pk);
+
+	/* Lower keyboard row - "zxcvbnm". */
+	bind_key(pk, "z", 24);	/* C1 */
+	bind_key(pk, "s", 25);
+	bind_key(pk, "x", 26);
+	bind_key(pk, "d", 27);
+	bind_key(pk, "c", 28);
+	bind_key(pk, "v", 29);
+	bind_key(pk, "g", 30);
+	bind_key(pk, "b", 31);
+	bind_key(pk, "h", 32);
+	bind_key(pk, "n", 33);
+	bind_key(pk, "j", 34);
+	bind_key(pk, "m", 35);
+
+	/* Upper keyboard row, first octave - "qwertyu". */
+	bind_key(pk, "q", 12); /* C0 */
+	bind_key(pk, "2", 13);
+	bind_key(pk, "w", 14);
+	bind_key(pk, "3", 15);
+	bind_key(pk, "e", 16);
+	bind_key(pk, "r", 17);
+	bind_key(pk, "5", 18);
+	bind_key(pk, "t", 19);
+	bind_key(pk, "6", 20);
+	bind_key(pk, "y", 21);
+	bind_key(pk, "7", 22);
+	bind_key(pk, "u", 23);
+
+	/* Upper keyboard row, the rest - "iop". */
+	bind_key(pk, "i", 24); /* C1 */
+	bind_key(pk, "9", 25);
+	bind_key(pk, "o", 26);
+	bind_key(pk, "0", 27);
+	bind_key(pk, "p", 28);
+}
+
+static void 
+bind_keys_qwerty_uk_rev(PianoKeyboard *pk)
+{
+	bind_keys_qwerty_rev(pk);
+
+	/* Lower keyboard row - "zxcvbnm". */
+	bind_key(pk, "backslash", 23); /* B-1 */
+	/* ... */
+	bind_key(pk, "comma", 36); /* C2 */
+	bind_key(pk, "l", 37);
+	bind_key(pk, "period", 38);
+	bind_key(pk, "semicolon", 39);
+	bind_key(pk, "slash", 40);
+
+	/* Upper keyboard row, the rest - "iop". */
+	bind_key(pk, "bracketleft", 29);
+	bind_key(pk, "equal", 30);
+	bind_key(pk, "bracketright", 31);
 }
 
 static void 
@@ -431,8 +515,8 @@ get_note_for_xy(PianoKeyboard *pk, int x, int y)
 
 	height = GTK_WIDGET(pk)->allocation.height;
 
-	if (y <= height / 2) {
-		for (note = 0; note < NNOTES - 1; note++) {
+	if (y <= ((height * 2) / 3)) { /* might be a black key */
+		for (note = 0; note <= pk->max_note; ++note) {
 			if (pk->notes[note].white)
 				continue;
 
@@ -441,7 +525,7 @@ get_note_for_xy(PianoKeyboard *pk, int x, int y)
 		}
 	}
 
-	for (note = 0; note < NNOTES - 1; note++) {
+	for (note = 0; note <= pk->max_note; ++note) {
 		if (!pk->notes[note].white)
 			continue;
 
@@ -534,13 +618,48 @@ piano_keyboard_size_request(GtkWidget *widget, GtkRequisition *requisition)
 	requisition->height = PIANO_KEYBOARD_DEFAULT_HEIGHT;
 }
 
+static int is_black(int key)
+{
+	int note_in_octave = key % 12;
+	if(              note_in_octave == 1 || note_in_octave == 3 ||
+	     note_in_octave == 6 || note_in_octave == 8 || note_in_octave == 10)
+		return 1;
+	return 0;
+}
+
+static double black_key_left_shift(int key)
+{
+	int note_in_octave = key % 12;
+	switch (note_in_octave)
+	{
+	case 1:
+		return 2.0/3.0;
+	case 3:
+		return 1.0/3.0;
+	case 6:
+		return 2.0/3.0;
+	case 8:
+		return 0.5;
+	case 10:
+		return 1.0/3.0;
+	default:
+		return 0;
+	}
+	return 0;
+}
+
 static void
 recompute_dimensions(PianoKeyboard *pk)
 {
-	int number_of_white_keys, key_width, black_key_width, useful_width, note,
-	    white_key = 0, note_in_octave, width, height;
+	int number_of_white_keys = 0, skipped_white_keys = 0, key_width, black_key_width, useful_width, note,
+	    white_key, width, height;
 
-	number_of_white_keys = (NNOTES - 1) * (7.0 / 12.0);
+	for (note = pk->min_note; note <= pk->max_note; ++note)
+		if (!is_black(note))
+			++number_of_white_keys;
+	for (note = 0; note < pk->min_note; ++note)
+		if (!is_black(note))
+			++skipped_white_keys;
 
 	width = GTK_WIDGET(pk)->allocation.width;
 	height = GTK_WIDGET(pk)->allocation.height;
@@ -550,18 +669,15 @@ recompute_dimensions(PianoKeyboard *pk)
 	useful_width = number_of_white_keys * key_width;
 	pk->widget_margin = (width - useful_width) / 2;
 
-	for (note = 0, white_key = 0; note < NNOTES - 2; note++) {
-		note_in_octave = note % 12;
-
-		if (note_in_octave == 1 || note_in_octave == 3 || note_in_octave == 6 ||
-		    note_in_octave == 8 || note_in_octave == 10) {
-
+	for (note = 0, white_key = -skipped_white_keys; note < NNOTES; note++) {
+		if (is_black(note)) {
 			/* This note is black key. */
-			pk->notes[note].x = pk->widget_margin + white_key * key_width - black_key_width / 2;
+			pk->notes[note].x = pk->widget_margin + 
+			    (white_key * key_width) -
+			    (black_key_width * black_key_left_shift(note));
 			pk->notes[note].w = black_key_width;
-			pk->notes[note].h = height / 2;
+			pk->notes[note].h = (height * 2) / 3;
 			pk->notes[note].white = 0;
-
 			continue;
 		}
 
@@ -663,6 +779,8 @@ piano_keyboard_new(void)
 	pk->note_being_pressed_using_mouse = -1;
 	memset((void *)pk->notes, 0, sizeof(struct Note) * NNOTES);
 	pk->key_bindings = g_hash_table_new(g_str_hash, g_str_equal);
+	pk->min_note = PIANO_MIN_NOTE;
+	pk->max_note = PIANO_MAX_NOTE;
 	bind_keys_qwerty(pk);
 
 	return (widget);
@@ -727,6 +845,15 @@ piano_keyboard_set_keyboard_layout(PianoKeyboard *pk, const char *layout)
 	if (!strcasecmp(layout, "QWERTY")) {
 		bind_keys_qwerty(pk);
 
+	} else if (!strcasecmp(layout, "QWERTY_REV")) {
+		bind_keys_qwerty_rev(pk);
+
+	} else if (!strcasecmp(layout, "QWERTY_UK")) {
+		bind_keys_qwerty_uk(pk);
+
+	} else if (!strcasecmp(layout, "QWERTY_UK_REV")) {
+		bind_keys_qwerty_uk_rev(pk);
+
 	} else if (!strcasecmp(layout, "QWERTZ")) {
 		bind_keys_qwertz(pk);
 
@@ -742,5 +869,13 @@ piano_keyboard_set_keyboard_layout(PianoKeyboard *pk, const char *layout)
 	}
 
 	return (FALSE);
+}
+
+void
+piano_keyboard_enable_all_midi_notes(PianoKeyboard* pk)
+{
+	pk->min_note = 0;
+	pk->max_note = NNOTES-1;
+	recompute_dimensions(pk);
 }
 

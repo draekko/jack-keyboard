@@ -42,7 +42,17 @@ G_BEGIN_DECLS
 typedef struct	_PianoKeyboard			PianoKeyboard;
 typedef struct	_PianoKeyboardClass		PianoKeyboardClass;
 
-#define NNOTES			127
+/* A note about note numbers:
+
+ 0   = C-1     (midi minmum)
+ 21  = A0      (piano minimum)
+ 60  = C4      (middle C)
+ 108 = C7      (piano maximum)
+ 127 = G9      (midi maximum)
+*/
+#define NNOTES			128
+#define PIANO_MIN_NOTE		21
+#define PIANO_MAX_NOTE		108
 
 #define OCTAVE_MIN	-1
 #define OCTAVE_MAX	7
@@ -66,6 +76,8 @@ struct _PianoKeyboard
 	int			octave;
 	int			widget_margin;
 	int			note_being_pressed_using_mouse;
+	int			min_note;
+	int			max_note;
 	volatile struct Note 	notes[NNOTES];
 	/* Table used to translate from PC keyboard character to MIDI note number. */
 	GHashTable		*key_bindings;
@@ -85,6 +97,7 @@ void		piano_keyboard_set_note_off	(PianoKeyboard *pk, int note);
 void		piano_keyboard_set_keyboard_cue	(PianoKeyboard *pk, int enabled);
 void		piano_keyboard_set_octave (PianoKeyboard *pk, int octave);
 gboolean	piano_keyboard_set_keyboard_layout (PianoKeyboard *pk, const char *layout);
+void		piano_keyboard_enable_all_midi_notes(PianoKeyboard* pk);
 
 G_END_DECLS
 

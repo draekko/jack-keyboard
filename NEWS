@@ -1,3 +1,26 @@
+User-visible changes between 2.6 and 2.7.1 include:
+
+ - fix a warning regarding the redefinition of NNOTES
+
+ - raise NNOTES from 127 to 128 (only notes 0..125 were being shown
+ because 127 was < NNOTES and 126 is black)
+
+ - only show the keys that exist on a real piano by default, and add a
+ "-f" ('full midi keyboard') command line option to show all midi
+ notes.
+
+ - make the dimensions slightly closer to a real piano by:
+   > making the black key hight two third of the white key height
+   > making the black key positions vary based on their position in
+     the octave
+
+ - adding a QWERTY_REV layout that has the lower keys on the upper row
+ of the keyboard
+
+ - adding QWERTY_UK and QWERTY_UK_REV layouts that extend the QWERTY
+ and QWERTY_REV layouts with the punctuation keys available on those
+ rows
+
 User-visible changes between 2.5 and 2.6 include:
 
  - Bugfix: A key volume of zero means key off.

@@ -1,4 +1,4 @@
-VERSION?=2.6
+VERSION?=2.7.1
 
 help:
 	@echo "Targets: configure all clean install package"
