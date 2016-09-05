@@ -209,27 +209,24 @@ stop_sustained_notes(PianoKeyboard *pk)
 }
 
 static int
-key_binding(PianoKeyboard *pk, const char *key)
+key_binding(PianoKeyboard *pk, guint16 key)
 {
-	gpointer notused, note;
-	gboolean found;
-
 	assert(pk->key_bindings != NULL);
 
-	found = g_hash_table_lookup_extended(pk->key_bindings, key, &notused, &note);
+	if (key >= pk->key_bindings->len)
+		return (0);
 
-	if (!found)
-		return (-1);
-
-	return ((long)note);
+	return (g_array_index(pk->key_bindings, int, key));
 }
 
 static void
-bind_key(PianoKeyboard *pk, const char *key, long note)
+bind_key(PianoKeyboard *pk, guint key, int note)
 {
 	assert(pk->key_bindings != NULL);
 
-	g_hash_table_insert(pk->key_bindings, (gpointer)key, (gpointer)note);
+	if (key >= pk->key_bindings->len)
+		g_array_set_size(pk->key_bindings, key + 1);
+	g_array_index(pk->key_bindings, int, key) = note;
 }
 
 static void
@@ -237,7 +234,7 @@ clear_notes(PianoKeyboard *pk)
 {
 	assert(pk->key_bindings != NULL);
 
-	g_hash_table_remove_all(pk->key_bindings);
+	g_array_set_size(pk->key_bindings, 0);
 }
 
 static void 
@@ -245,250 +242,64 @@ bind_keys_qwerty(PianoKeyboard *pk)
 {
 	clear_notes(pk);
 
-	/* Lower keyboard row - "zxcvbnm". */
-	bind_key(pk, "z", 12);	/* C0 */
-	bind_key(pk, "s", 13);
-	bind_key(pk, "x", 14);
-	bind_key(pk, "d", 15);
-	bind_key(pk, "c", 16);
-	bind_key(pk, "v", 17);
-	bind_key(pk, "g", 18);
-	bind_key(pk, "b", 19);
-	bind_key(pk, "h", 20);
-	bind_key(pk, "n", 21);
-	bind_key(pk, "j", 22);
-	bind_key(pk, "m", 23);
+	/* Lower keyboard row - "zxcvbnm". 52 is z, 38 is a. */
+	bind_key(pk, 52, 12);	/* C0 */
+	bind_key(pk, 39, 13);
+	bind_key(pk, 53, 14);
+	bind_key(pk, 40, 15);
+	bind_key(pk, 54, 16);
+	bind_key(pk, 55, 17);
+	bind_key(pk, 42, 18);
+	bind_key(pk, 56, 19);
+	bind_key(pk, 43, 20);
+	bind_key(pk, 57, 21);
+	bind_key(pk, 44, 22);
+	bind_key(pk, 58, 23);
 
-	/* Upper keyboard row, first octave - "qwertyu". */
-	bind_key(pk, "q", 24); /* C1 */
-	bind_key(pk, "2", 25);
-	bind_key(pk, "w", 26);
-	bind_key(pk, "3", 27);
-	bind_key(pk, "e", 28);
-	bind_key(pk, "r", 29);
-	bind_key(pk, "5", 30);
-	bind_key(pk, "t", 31);
-	bind_key(pk, "6", 32);
-	bind_key(pk, "y", 33);
-	bind_key(pk, "7", 34);
-	bind_key(pk, "u", 35);
+	/* Map the remaining keys. This overlaps with qwe. */
+	bind_key(pk, 59, 24);
+	bind_key(pk, 46, 25);
+	bind_key(pk, 60, 26);
+	bind_key(pk, 47, 27);
+	bind_key(pk, 61, 28);
 
-	/* Upper keyboard row, the rest - "iop". */
-	bind_key(pk, "i", 36); /* C2 */
-	bind_key(pk, "9", 37);
-	bind_key(pk, "o", 38);
-	bind_key(pk, "0", 39);
-	bind_key(pk, "p", 40);
-}
-
-static void 
-bind_keys_qwerty_uk(PianoKeyboard *pk)
-{
-	bind_keys_qwerty(pk);
-
-	/* Lower keyboard row - "zxcvbnm". */
-	bind_key(pk, "backslash", 11); /* B0 */
-	/* ... */
-	bind_key(pk, "comma", 24); /* C1 */
-	bind_key(pk, "l", 25);
-	bind_key(pk, "period", 26);
-	bind_key(pk, "semicolon", 27);
-	bind_key(pk, "slash", 28);
+	/* Upper keyboard row, first octave - "qwertyu". 24 is q, 10 is 1. */
+	bind_key(pk, 24, 24);
+	bind_key(pk, 11, 25);
+	bind_key(pk, 25, 26);
+	bind_key(pk, 12, 27);
+	bind_key(pk, 26, 28);
+	bind_key(pk, 27, 29);
+	bind_key(pk, 14, 30);
+	bind_key(pk, 28, 31);
+	bind_key(pk, 15, 32);
+	bind_key(pk, 29, 33);
+	bind_key(pk, 16, 34);
+	bind_key(pk, 30, 35);
 
 	/* Upper keyboard row, the rest - "iop". */
-	bind_key(pk, "bracketleft", 41); /* F6 */
-	bind_key(pk, "equal", 42);
-	bind_key(pk, "bracketright", 43);
-}
-static void 
-bind_keys_qwerty_rev(PianoKeyboard *pk)
-{
-	clear_notes(pk);
+	bind_key(pk, 31, 36);
+	bind_key(pk, 18, 37);
+	bind_key(pk, 32, 38);
+	bind_key(pk, 19, 39);
+	bind_key(pk, 33, 40);
 
-	/* Lower keyboard row - "zxcvbnm". */
-	bind_key(pk, "z", 24);	/* C1 */
-	bind_key(pk, "s", 25);
-	bind_key(pk, "x", 26);
-	bind_key(pk, "d", 27);
-	bind_key(pk, "c", 28);
-	bind_key(pk, "v", 29);
-	bind_key(pk, "g", 30);
-	bind_key(pk, "b", 31);
-	bind_key(pk, "h", 32);
-	bind_key(pk, "n", 33);
-	bind_key(pk, "j", 34);
-	bind_key(pk, "m", 35);
-
-	/* Upper keyboard row, first octave - "qwertyu". */
-	bind_key(pk, "q", 12); /* C0 */
-	bind_key(pk, "2", 13);
-	bind_key(pk, "w", 14);
-	bind_key(pk, "3", 15);
-	bind_key(pk, "e", 16);
-	bind_key(pk, "r", 17);
-	bind_key(pk, "5", 18);
-	bind_key(pk, "t", 19);
-	bind_key(pk, "6", 20);
-	bind_key(pk, "y", 21);
-	bind_key(pk, "7", 22);
-	bind_key(pk, "u", 23);
-
-	/* Upper keyboard row, the rest - "iop". */
-	bind_key(pk, "i", 24); /* C1 */
-	bind_key(pk, "9", 25);
-	bind_key(pk, "o", 26);
-	bind_key(pk, "0", 27);
-	bind_key(pk, "p", 28);
-}
-
-static void 
-bind_keys_qwerty_uk_rev(PianoKeyboard *pk)
-{
-	bind_keys_qwerty_rev(pk);
-
-	/* Lower keyboard row - "zxcvbnm". */
-	bind_key(pk, "backslash", 23); /* B-1 */
-	/* ... */
-	bind_key(pk, "comma", 36); /* C2 */
-	bind_key(pk, "l", 37);
-	bind_key(pk, "period", 38);
-	bind_key(pk, "semicolon", 39);
-	bind_key(pk, "slash", 40);
-
-	/* Upper keyboard row, the rest - "iop". */
-	bind_key(pk, "bracketleft", 29);
-	bind_key(pk, "equal", 30);
-	bind_key(pk, "bracketright", 31);
-}
-
-static void 
-bind_keys_qwertz(PianoKeyboard *pk)
-{
-	bind_keys_qwerty(pk);
-
-	/* The only difference between QWERTY and QWERTZ is that the "y" and "z" are swapped together. */
-	bind_key(pk, "y", 12);
-	bind_key(pk, "z", 33);
-}
-
-static void
-bind_keys_azerty(PianoKeyboard *pk)
-{
-	clear_notes(pk);
-
-	/* Lower keyboard row - "wxcvbn,". */
-	bind_key(pk, "w", 12);	/* C0 */
-	bind_key(pk, "s", 13);
-	bind_key(pk, "x", 14);
-	bind_key(pk, "d", 15);
-	bind_key(pk, "c", 16);
-	bind_key(pk, "v", 17);
-	bind_key(pk, "g", 18);
-	bind_key(pk, "b", 19);
-	bind_key(pk, "h", 20);
-	bind_key(pk, "n", 21);
-	bind_key(pk, "j", 22);
-	bind_key(pk, "comma", 23);
-
-	/* Upper keyboard row, first octave - "azertyu". */
-	bind_key(pk, "a", 24);
-	bind_key(pk, "eacute", 25);
-	bind_key(pk, "z", 26);
-	bind_key(pk, "quotedbl", 27);
-	bind_key(pk, "e", 28);
-	bind_key(pk, "r", 29);
-	bind_key(pk, "parenleft", 30);
-	bind_key(pk, "t", 31);
-	bind_key(pk, "minus", 32);
-	bind_key(pk, "y", 33);
-	bind_key(pk, "egrave", 34);
-	bind_key(pk, "u", 35);
-
-	/* Upper keyboard row, the rest - "iop". */
-	bind_key(pk, "i", 36);
-	bind_key(pk, "ccedilla", 37);
-	bind_key(pk, "o", 38);
-	bind_key(pk, "agrave", 39);
-	bind_key(pk, "p", 40);
-}
-
-static void 
-bind_keys_dvorak(PianoKeyboard *pk)
-{
-	clear_notes(pk);
-
-	/* Lower keyboard row - ";qjkxbm". */
-	bind_key(pk, "semicolon", 12); /* C0 */
-	bind_key(pk, "o", 13);
-	bind_key(pk, "q", 14);
-	bind_key(pk, "e", 15);
-	bind_key(pk, "j", 16);
-	bind_key(pk, "k", 17);
-	bind_key(pk, "i", 18);
-	bind_key(pk, "x", 19);
-	bind_key(pk, "d", 20);
-	bind_key(pk, "b", 21);
-	bind_key(pk, "h", 22);
-	bind_key(pk, "m", 23);
-	bind_key(pk, "w", 24); /* overlaps with upper row */
-	bind_key(pk, "n", 25);
-	bind_key(pk, "v", 26);
-	bind_key(pk, "s", 27);
-	bind_key(pk, "z", 28);
-
-	/* Upper keyboard row, first octave - "',.pyfg". */
-	bind_key(pk, "apostrophe", 24);
-	bind_key(pk, "2", 25);
-	bind_key(pk, "comma", 26);
-	bind_key(pk, "3", 27);
-	bind_key(pk, "period", 28);
-	bind_key(pk, "p", 29);
-	bind_key(pk, "5", 30);
-	bind_key(pk, "y", 31);
-	bind_key(pk, "6", 32);
-	bind_key(pk, "f", 33);
-	bind_key(pk, "7", 34);
-	bind_key(pk, "g", 35);
-
-	/* Upper keyboard row, the rest - "crl". */
-	bind_key(pk, "c", 36);
-	bind_key(pk, "9", 37);
-	bind_key(pk, "r", 38);
-	bind_key(pk, "0", 39);
-	bind_key(pk, "l", 40);
-	bind_key(pk, "slash", 41); /* extra F */
-	bind_key(pk, "bracketright", 42);
-	bind_key(pk, "equal", 43);
-
+	/* We might as well bind these too: "[=]\" */
+	bind_key(pk, 34, 41);
+	bind_key(pk, 21, 42);
+	bind_key(pk, 35, 43);
+	bind_key(pk, 51, 45); /* yes, really, at least here... */
 }
 
 static gint 
 keyboard_event_handler(GtkWidget *mk, GdkEventKey *event, gpointer notused)
 {
 	int note;
-	char *key;
-	guint keyval;
-	GdkKeymapKey kk;
 	PianoKeyboard *pk = PIANO_KEYBOARD(mk);
 
-	/* We're not using event->keyval, because we need keyval with level set to 0.
-	   E.g. if user holds Shift and presses '7', we want to get a '7', not '&'. */
-	kk.keycode = event->hardware_keycode;
-	kk.level = 0;
-	kk.group = 0;
+	note = key_binding(pk, event->hardware_keycode);
 
-	keyval = gdk_keymap_lookup_key(NULL, &kk);
-
-	key = gdk_keyval_name(gdk_keyval_to_lower(keyval));
-
-	if (key == NULL) {
-		g_message("gtk_keyval_name() returned NULL; please report this.");
-		return (FALSE);
-	}
-
-	note = key_binding(pk, key);
-
-	if (note < 0) {
+	if (note <= 0) {
 		/* Key was not bound.  Maybe it's one of the keys handled in jack-keyboard.c. */
 		return (FALSE);
 	}
@@ -778,7 +589,8 @@ piano_keyboard_new(void)
 	pk->octave = 4;
 	pk->note_being_pressed_using_mouse = -1;
 	memset((void *)pk->notes, 0, sizeof(struct Note) * NNOTES);
-	pk->key_bindings = g_hash_table_new(g_str_hash, g_str_equal);
+	/* 255 here is a random value larger than the highest key we bind. */
+	pk->key_bindings = g_array_sized_new(FALSE, TRUE, sizeof(int), 255);
 	pk->min_note = PIANO_MIN_NOTE;
 	pk->max_note = PIANO_MAX_NOTE;
 	bind_keys_qwerty(pk);
@@ -844,24 +656,6 @@ piano_keyboard_set_keyboard_layout(PianoKeyboard *pk, const char *layout)
 
 	if (!strcasecmp(layout, "QWERTY")) {
 		bind_keys_qwerty(pk);
-
-	} else if (!strcasecmp(layout, "QWERTY_REV")) {
-		bind_keys_qwerty_rev(pk);
-
-	} else if (!strcasecmp(layout, "QWERTY_UK")) {
-		bind_keys_qwerty_uk(pk);
-
-	} else if (!strcasecmp(layout, "QWERTY_UK_REV")) {
-		bind_keys_qwerty_uk_rev(pk);
-
-	} else if (!strcasecmp(layout, "QWERTZ")) {
-		bind_keys_qwertz(pk);
-
-	} else if (!strcasecmp(layout, "AZERTY")) {
-		bind_keys_azerty(pk);
-
-	} else if (!strcasecmp(layout, "DVORAK")) {
-		bind_keys_dvorak(pk);
 
 	} else {
 		/* Unknown layout name. */

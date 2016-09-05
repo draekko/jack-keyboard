@@ -80,7 +80,7 @@ struct _PianoKeyboard
 	int			max_note;
 	volatile struct Note 	notes[NNOTES];
 	/* Table used to translate from PC keyboard character to MIDI note number. */
-	GHashTable		*key_bindings;
+	GArray			*key_bindings;
 };
 
 struct _PianoKeyboardClass
