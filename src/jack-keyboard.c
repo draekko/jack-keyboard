@@ -1054,7 +1054,7 @@ keyboard_grab_filter(GdkXEvent *xevent, GdkEvent *event, gpointer notused)
 
 	/* Lie to GDK, pretending we are the proper recipient of this XEvent.  Without it,
 	   GDK would discard it. */
-	xke->window = GDK_WINDOW_XWINDOW(window->window);
+	xke->window = GDK_WINDOW_XWINDOW(gtk_widget_get_window(window));
 
 	return (GDK_FILTER_CONTINUE);
 }
@@ -1097,7 +1097,7 @@ grab_keyboard(void)
 	if (keyboard_grabbed)
 		return;
 
-	dpy = GDK_WINDOW_XDISPLAY(window->window);
+	dpy = GDK_WINDOW_XDISPLAY(gtk_widget_get_window(window));
 
 	keyboard_grabbed = 1;
 
@@ -1570,7 +1570,7 @@ init_gtk_2(void)
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 0, 1, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	channel_spin = gtk_spin_button_new_with_range(1, CHANNEL_MAX, 1);
-	GTK_WIDGET_UNSET_FLAGS(channel_spin, GTK_CAN_FOCUS);
+	gtk_widget_set_can_focus(channel_spin, FALSE);
 	gtk_table_attach(table, channel_spin, 1, 2, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	g_signal_connect(G_OBJECT(channel_spin), "value-changed", G_CALLBACK(channel_event_handler), NULL);
 
@@ -1579,7 +1579,7 @@ init_gtk_2(void)
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 2, 3, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	bank_spin = gtk_spin_button_new_with_range(0, BANK_MAX, 1);
-	GTK_WIDGET_UNSET_FLAGS(bank_spin, GTK_CAN_FOCUS);
+	gtk_widget_set_can_focus(bank_spin, FALSE);
 	gtk_table_attach(table, bank_spin, 3, 4, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	g_signal_connect(G_OBJECT(bank_spin), "value-changed", G_CALLBACK(bank_event_handler), NULL);
 
@@ -1588,7 +1588,7 @@ init_gtk_2(void)
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 4, 5, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	program_spin = gtk_spin_button_new_with_range(0, PROGRAM_MAX, 1);
-	GTK_WIDGET_UNSET_FLAGS(program_spin, GTK_CAN_FOCUS);
+	gtk_widget_set_can_focus(program_spin, FALSE);
 	gtk_table_attach(table, program_spin, 5, 6, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	g_signal_connect(G_OBJECT(program_spin), "value-changed", G_CALLBACK(program_event_handler), NULL);
 
@@ -1604,7 +1604,7 @@ init_gtk_2(void)
 	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(connected_to_combo), renderer, FALSE);
 	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT(connected_to_combo), renderer, "text", 0, NULL);
 
-	GTK_WIDGET_UNSET_FLAGS(connected_to_combo, GTK_CAN_FOCUS);
+	gtk_widget_set_can_focus(connected_to_combo, FALSE);
 	gtk_combo_box_set_focus_on_click(GTK_COMBO_BOX(connected_to_combo), FALSE);
 	gtk_table_attach(table, connected_to_combo, 7, 8, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	gtk_widget_set_size_request(GTK_WIDGET(connected_to_combo), 200, -1);
@@ -1615,7 +1615,7 @@ init_gtk_2(void)
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 0, 1, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	octave_spin = gtk_spin_button_new_with_range(OCTAVE_MIN, OCTAVE_MAX, 1);
-	GTK_WIDGET_UNSET_FLAGS(octave_spin, GTK_CAN_FOCUS);
+	gtk_widget_set_can_focus(octave_spin, FALSE);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(octave_spin), octave);
 	gtk_table_attach(table, octave_spin, 1, 2, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	g_signal_connect(G_OBJECT(octave_spin), "value-changed", G_CALLBACK(octave_event_handler), NULL);
@@ -1625,7 +1625,7 @@ init_gtk_2(void)
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 4, 5, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	grab_keyboard_checkbutton = gtk_check_button_new();
-	GTK_WIDGET_UNSET_FLAGS(grab_keyboard_checkbutton, GTK_CAN_FOCUS);
+	gtk_widget_set_can_focus(grab_keyboard_checkbutton, FALSE);
 	g_signal_connect(G_OBJECT(grab_keyboard_checkbutton), "toggled", G_CALLBACK(grab_keyboard_handler), NULL);
 	gtk_table_attach(table, grab_keyboard_checkbutton, 5, 6, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
@@ -1636,7 +1636,7 @@ init_gtk_2(void)
 
 	velocity_hscale = gtk_hscale_new_with_range(VELOCITY_MIN, VELOCITY_MAX, 1);
 	gtk_scale_set_draw_value(GTK_SCALE(velocity_hscale), FALSE);
-	GTK_WIDGET_UNSET_FLAGS(velocity_hscale, GTK_CAN_FOCUS);
+	gtk_widget_set_can_focus(velocity_hscale, FALSE);
 	g_signal_connect(G_OBJECT(velocity_hscale), "value-changed", G_CALLBACK(velocity_event_handler), NULL);
 	gtk_range_set_value(GTK_RANGE(velocity_hscale), VELOCITY_NORMAL);
 	gtk_table_attach(table, velocity_hscale, 7, 8, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
