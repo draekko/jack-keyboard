@@ -55,23 +55,23 @@ draw_keyboard_cue(PianoKeyboard *pk)
 	int w, h, first_note_in_lower_row, last_note_in_lower_row,
 	    first_note_in_higher_row, last_note_in_higher_row;
 
-	GdkGC *gc;
-
 	w = pk->notes[0].w;
 	h = pk->notes[0].h;
-
-	gc = GTK_WIDGET(pk)->style->fg_gc[0];
 
 	first_note_in_lower_row = (pk->octave + 5) * 12;
 	last_note_in_lower_row = (pk->octave + 6) * 12 - 1;
 	first_note_in_higher_row = (pk->octave + 6) * 12;
 	last_note_in_higher_row = (pk->octave + 7) * 12 + 4;
 
-	gdk_draw_line(GTK_WIDGET(pk)->window, gc, pk->notes[first_note_in_lower_row].x + 3,
-	    h - 6, pk->notes[last_note_in_lower_row].x + w - 3, h - 6);
+	cairo_t *cr = gdk_cairo_create(gtk_widget_get_window(GTK_WIDGET(pk)));
 
-	gdk_draw_line(GTK_WIDGET(pk)->window, gc, pk->notes[first_note_in_higher_row].x + 3,
-	    h - 9, pk->notes[last_note_in_higher_row].x + w - 3, h - 9);
+	cairo_move_to(cr, pk->notes[first_note_in_lower_row].x + 3, h - 6);
+	cairo_line_to(cr, pk->notes[last_note_in_lower_row].x + w - 3, h - 6);
+
+	cairo_move_to(cr, pk->notes[first_note_in_higher_row].x + 3, h - 9);
+	cairo_line_to(cr, pk->notes[last_note_in_higher_row].x + w - 3, h - 9);
+
+	cairo_destroy(cr);
 }
 
 static void
@@ -83,10 +83,11 @@ draw_note(PianoKeyboard *pk, int note)
 		return;
 	int is_white, x, w, h;
 
+	cairo_t *cr = gdk_cairo_create(gtk_widget_get_window(GTK_WIDGET(pk)));
+
 	GdkColor black = {0, 0, 0, 0};
 	GdkColor white = {0, 65535, 65535, 65535};
 
-	GdkGC *gc = GTK_WIDGET(pk)->style->fg_gc[0];
 	GtkWidget *widget;
 
 	is_white = pk->notes[note].white;
@@ -99,13 +100,17 @@ draw_note(PianoKeyboard *pk, int note)
 		is_white = !is_white;
 
 	if (is_white)
-		gdk_gc_set_rgb_fg_color(gc, &white);
+		gdk_cairo_set_source_color(cr, &white);
 	else
-		gdk_gc_set_rgb_fg_color(gc, &black);
+		gdk_cairo_set_source_color(cr, &black);
 
-	gdk_draw_rectangle(GTK_WIDGET(pk)->window, gc, TRUE, x, 0, w, h);
-	gdk_gc_set_rgb_fg_color(gc, &black);
-	gdk_draw_rectangle(GTK_WIDGET(pk)->window, gc, FALSE, x, 0, w, h);
+	cairo_rectangle(cr, x, 0, w, h);
+	cairo_fill(cr);
+	gdk_cairo_set_source_color(cr, &black);
+	cairo_rectangle(cr, x, 0, w, h);
+	cairo_stroke(cr);
+
+	cairo_destroy(cr);
 
 	if (pk->enable_keyboard_cue)
 		draw_keyboard_cue(pk);
