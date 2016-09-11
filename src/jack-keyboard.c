@@ -1131,8 +1131,6 @@ grab_keyboard(void)
 		return;
 	}
 
-	g_atexit(ungrab_keyboard);
-
 	gdk_window_add_filter(NULL, keyboard_grab_filter, NULL);
 }
 
@@ -1715,11 +1713,6 @@ main(int argc, char *argv[])
 
 #ifdef HAVE_LASH
 	lash_args_t *lash_args;
-#endif
-
-	g_thread_init(NULL);
-
-#ifdef HAVE_LASH
 	lash_args = lash_extract_args(&argc, &argv);
 #endif
 
@@ -1871,6 +1864,9 @@ main(int argc, char *argv[])
 	piano_keyboard_set_keyboard_cue(keyboard, enable_keyboard_cue);
 
 	gtk_main();
+
+	if (keyboard_grabbed)
+		ungrab_keyboard();
 
 	return (0);
 }
