@@ -1215,70 +1215,70 @@ maybe_add_digit(GdkEventKey *event)
 	 * XXX: This is silly.  Find a way to enter the number without
 	 * all these contitional instructions.
 	 */
-	if (event->keyval == GDK_KP_0 || event->keyval == GDK_KP_Insert) {
+	if (event->keyval == GDK_KEY_KP_0 || event->keyval == GDK_KEY_KP_Insert) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(0);
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_1 || event->keyval == GDK_KP_End) {
+	if (event->keyval == GDK_KEY_KP_1 || event->keyval == GDK_KEY_KP_End) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(1);
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_2 || event->keyval == GDK_KP_Down) {
+	if (event->keyval == GDK_KEY_KP_2 || event->keyval == GDK_KEY_KP_Down) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(2);
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_3 || event->keyval == GDK_KP_Page_Down) {
+	if (event->keyval == GDK_KEY_KP_3 || event->keyval == GDK_KEY_KP_Page_Down) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(3);
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_4 || event->keyval == GDK_KP_Left) {
+	if (event->keyval == GDK_KEY_KP_4 || event->keyval == GDK_KEY_KP_Left) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(4);
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_5 || event->keyval == GDK_KP_Begin) {
+	if (event->keyval == GDK_KEY_KP_5 || event->keyval == GDK_KEY_KP_Begin) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(5);
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_6 || event->keyval == GDK_KP_Right) {
+	if (event->keyval == GDK_KEY_KP_6 || event->keyval == GDK_KEY_KP_Right) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(6);
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_7 || event->keyval == GDK_KP_Home) {
+	if (event->keyval == GDK_KEY_KP_7 || event->keyval == GDK_KEY_KP_Home) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(7);
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_8 || event->keyval == GDK_KP_Up) {
+	if (event->keyval == GDK_KEY_KP_8 || event->keyval == GDK_KEY_KP_Up) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(8);
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_9 || event->keyval == GDK_KP_Page_Up) {
+	if (event->keyval == GDK_KEY_KP_9 || event->keyval == GDK_KEY_KP_Page_Up) {
 		if (event->type == GDK_KEY_PRESS)
 			add_digit(9);
 
@@ -1334,14 +1334,14 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 	/*
 	 * '+' key shifts octave up. '-' key shifts octave down.
 	 */
-	if (event->keyval == GDK_KP_Add || event->keyval  == GDK_equal) {
+	if (event->keyval == GDK_KEY_KP_Add || event->keyval  == GDK_KEY_equal) {
 		if (event->type == GDK_KEY_PRESS && octave < OCTAVE_MAX)
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(octave_spin), octave + 1);
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_Subtract || event->keyval == GDK_minus) {
+	if (event->keyval == GDK_KEY_KP_Subtract || event->keyval == GDK_KEY_minus) {
 		if (event->type == GDK_KEY_PRESS && octave > OCTAVE_MIN)
 			gtk_spin_button_set_value(GTK_SPIN_BUTTON(octave_spin), octave - 1);
 
@@ -1351,7 +1351,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 	/*
 	 * '*' character increases program number. '/' character decreases it.
 	 */
-	if (event->keyval == GDK_KP_Multiply) {
+	if (event->keyval == GDK_KEY_KP_Multiply) {
 		if (event->type == GDK_KEY_PRESS) {
 
 			tmp = get_entered_number();
@@ -1365,7 +1365,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_KP_Divide) {
+	if (event->keyval == GDK_KEY_KP_Divide) {
 		if (event->type == GDK_KEY_PRESS) {
 
 			tmp = get_entered_number();
@@ -1382,7 +1382,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 	/*
 	 * PgUp key increases bank number, PgDown decreases it.
 	 */
-	if (event->keyval == GDK_Page_Up) {
+	if (event->keyval == GDK_KEY_Page_Up) {
 		if (event->type == GDK_KEY_PRESS) {
 
 			tmp = get_entered_number();
@@ -1396,7 +1396,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_Page_Down) {
+	if (event->keyval == GDK_KEY_Page_Down) {
 		if (event->type == GDK_KEY_PRESS) {
 
 			tmp = get_entered_number();
@@ -1413,7 +1413,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 	/*
 	 * Home key increases channel number, End decreases it.
 	 */
-	if (event->keyval == GDK_Home) {
+	if (event->keyval == GDK_KEY_Home) {
 		if (event->type == GDK_KEY_PRESS) {
 
 			tmp = get_entered_number();
@@ -1427,7 +1427,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_End) {
+	if (event->keyval == GDK_KEY_End) {
 		if (event->type == GDK_KEY_PRESS) {
 
 			tmp = get_entered_number();
@@ -1444,21 +1444,21 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 	/*
 	 * Insert key connects to the next input port.  Delete connects to the previous one.
 	 */
-	if (event->keyval == GDK_Insert) {
+	if (event->keyval == GDK_KEY_Insert) {
 		if (event->type == GDK_KEY_PRESS)
 			connect_to_next_input_port();
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_Delete) {
+	if (event->keyval == GDK_KEY_Delete) {
 		if (event->type == GDK_KEY_PRESS)
 			connect_to_prev_input_port();
 
 		return (TRUE);
 	}
 
-	if (event->keyval == GDK_Escape) {
+	if (event->keyval == GDK_KEY_Escape) {
 		if (event->type == GDK_KEY_PRESS)
 			panic();
 
@@ -1472,7 +1472,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 	 * the sustained notes end (it will send 'note off' midi messages for
 	 * all the sustained notes).
 	 */
-	if (event->keyval == GDK_space) {
+	if (event->keyval == GDK_KEY_space) {
 		if (event->type == GDK_KEY_PRESS)
 			gtk_button_pressed(GTK_BUTTON(sustain_button));
 		else
@@ -1485,7 +1485,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 	 * Shift increases velocity, i.e. holding it while pressing note key
 	 * will make the sound louder. Ctrl decreases velocity.
 	 */
-	if (event->keyval == GDK_Shift_L || event->keyval == GDK_Shift_R) {
+	if (event->keyval == GDK_KEY_Shift_L || event->keyval == GDK_KEY_Shift_R) {
 		if (event->type == GDK_KEY_PRESS)
 			current_velocity = &velocity_high;
 		else
@@ -1497,7 +1497,7 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 
 	}
 
-	if (event->keyval == GDK_Control_L || event->keyval == GDK_Control_R) {
+	if (event->keyval == GDK_KEY_Control_L || event->keyval == GDK_KEY_Control_R) {
 		if (event->type == GDK_KEY_PRESS)
 			current_velocity = &velocity_low;
 		else
