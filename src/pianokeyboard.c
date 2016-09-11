@@ -89,6 +89,7 @@ draw_note(PianoKeyboard *pk, int note)
 	GdkColor white = {0, 65535, 65535, 65535};
 
 	GtkWidget *widget;
+	GtkAllocation allocation;
 
 	is_white = pk->notes[note].white;
 
@@ -129,9 +130,10 @@ draw_note(PianoKeyboard *pk, int note)
 	 * that didn't work.
 	 */
 	widget = GTK_WIDGET(pk);
-	gtk_paint_shadow(widget->style, widget->window, GTK_STATE_NORMAL, GTK_SHADOW_IN, NULL,
-	    widget, NULL, pk->widget_margin, 0, widget->allocation.width - pk->widget_margin * 2 + 1,
-	    widget->allocation.height);
+	gtk_widget_get_allocation(widget, &allocation);
+	gtk_paint_shadow(gtk_widget_get_style(widget), gtk_widget_get_window(widget), GTK_STATE_NORMAL, GTK_SHADOW_IN, NULL,
+	    widget, NULL, pk->widget_margin, 0, allocation.width - pk->widget_margin * 2 + 1,
+	    allocation.height);
 }
 
 static int
@@ -328,8 +330,10 @@ static int
 get_note_for_xy(PianoKeyboard *pk, int x, int y)
 {
 	int height, note;
+	GtkAllocation allocation;
 
-	height = GTK_WIDGET(pk)->allocation.height;
+	gtk_widget_get_allocation(GTK_WIDGET(pk), &allocation);
+	height = allocation.height;
 
 	if (y <= ((height * 2) / 3)) { /* might be a black key */
 		for (note = 0; note <= pk->max_note; ++note) {
@@ -469,6 +473,7 @@ recompute_dimensions(PianoKeyboard *pk)
 {
 	int number_of_white_keys = 0, skipped_white_keys = 0, key_width, black_key_width, useful_width, note,
 	    white_key, width, height;
+	GtkAllocation allocation;
 
 	for (note = pk->min_note; note <= pk->max_note; ++note)
 		if (!is_black(note))
@@ -477,8 +482,9 @@ recompute_dimensions(PianoKeyboard *pk)
 		if (!is_black(note))
 			++skipped_white_keys;
 
-	width = GTK_WIDGET(pk)->allocation.width;
-	height = GTK_WIDGET(pk)->allocation.height;
+	gtk_widget_get_allocation(GTK_WIDGET(pk), &allocation);
+	width = allocation.width;
+	height = allocation.height;
 
 	key_width = width / number_of_white_keys;
 	black_key_width = key_width * 0.8;
@@ -514,12 +520,12 @@ piano_keyboard_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
 	g_return_if_fail(widget != NULL);
 	g_return_if_fail(allocation != NULL);
 
-	widget->allocation = *allocation;
+	gtk_widget_set_allocation(widget, allocation);
 
 	recompute_dimensions(PIANO_KEYBOARD(widget));
 
-	if (GTK_WIDGET_REALIZED(widget))
-		gdk_window_move_resize (widget->window, allocation->x, allocation->y, allocation->width, allocation->height);
+	if (gtk_widget_get_realized(widget))
+		gdk_window_move_resize (gtk_widget_get_window(widget), allocation->x, allocation->y, allocation->width, allocation->height);
 }
 
 static void

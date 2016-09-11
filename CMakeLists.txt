@@ -38,7 +38,7 @@ project(jack-keyboard)
 
 add_executable(jack-keyboard src/jack-keyboard src/pianokeyboard)
 
-find_package(GTK2 2.18 REQUIRED gtk)
+find_package(GTK2 2.20 REQUIRED gtk)
 include_directories(${GTK2_INCLUDE_DIRS})
 target_link_libraries(jack-keyboard ${GTK2_LIBRARIES})
 
