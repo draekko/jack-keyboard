@@ -152,7 +152,7 @@ int		channel = 0;
 void draw_note(int key);
 void queue_message(struct MidiMessage *ev);
 
-double 
+double
 get_time(void)
 {
 	double seconds;
@@ -399,7 +399,7 @@ process_midi_output(jack_nframes_t nframes)
 	}
 }
 
-int 
+int
 process_callback(jack_nframes_t nframes, void *notused)
 {
 #ifdef MEASURE_TIME
@@ -440,7 +440,7 @@ queue_message(struct MidiMessage *ev)
 		g_warning("jack_ringbuffer_write failed, NOTE LOST.");
 }
 
-void 
+void
 queue_new_message(int b0, int b1, int b2)
 {
 	struct MidiMessage ev;
@@ -524,7 +524,7 @@ update_connected_to_combo_async(gpointer notused)
 	return (FALSE);
 }
 
-void 
+void
 draw_window_title(void)
 {
 	int i, off = 0;
@@ -577,7 +577,7 @@ update_window_title_async(gpointer notused)
 	return (FALSE);
 }
 
-int 
+int
 graph_order_callback(void *notused)
 {
 	g_idle_add(update_window_title_async, NULL);
@@ -625,7 +625,7 @@ connect_to_input_port(const char *port)
                 g_warning("Cannot connect to %s.", port);
 
                 return (-4);
-        } 
+        }
 
 	g_warning("Connected to %s.", port);
 
@@ -725,19 +725,19 @@ connected:
 		free(connected_ports);
 }
 
-void 
+void
 connect_to_next_input_port(void)
 {
 	connect_to_another_input_port(1);
 }
 
-void 
+void
 connect_to_prev_input_port(void)
 {
 	connect_to_another_input_port(0);
 }
 
-void 
+void
 init_jack(void)
 {
 	int err;
@@ -815,7 +815,7 @@ load_config_from_lash(void)
 	int value;
 
 	while ((config = lash_get_config(lash_client))) {
-		
+
 		key = lash_config_get_key(config);
 		value = lash_config_get_value_int(config);
 
@@ -1032,7 +1032,7 @@ velocity_event_handler(GtkRange *range, gpointer notused)
 
 #ifdef HAVE_X11
 
-int grab_x_error_handler(Display *dpy, XErrorEvent *notused) 
+int grab_x_error_handler(Display *dpy, XErrorEvent *notused)
 {
 	keyboard_grabbed = 0;
 
@@ -1085,7 +1085,7 @@ grab_keyboard(void)
 		XK_q, XK_w, XK_e, XK_r, XK_t, XK_y, XK_u, XK_i, XK_o, XK_p,
 		XK_a, XK_s, XK_d, XK_f, XK_g, XK_h, XK_j, XK_k, XK_l,
 		XK_z, XK_x, XK_c, XK_v, XK_b, XK_n, XK_m,
-		XK_Shift_L, XK_Shift_R, XK_Control_L, XK_Control_R, XK_space, 
+		XK_Shift_L, XK_Shift_R, XK_Control_L, XK_Control_R, XK_space,
 		XK_Insert, XK_Delete, XK_Home, XK_End, XK_Page_Up, XK_Page_Down,
 		XK_KP_1, XK_KP_2, XK_KP_3, XK_KP_4, XK_KP_5, XK_KP_6, XK_KP_7, XK_KP_8, XK_KP_9, XK_KP_0,
 		XK_Num_Lock, XK_KP_Multiply, XK_KP_Divide, XK_KP_Subtract, XK_KP_Add, XK_KP_Enter,
@@ -1169,7 +1169,7 @@ octave_event_handler(GtkSpinButton *spinbutton, gpointer notused)
 	piano_keyboard_set_octave(keyboard, octave);
 }
 
-void 
+void
 panic(void)
 {
 	int i;
@@ -1314,7 +1314,7 @@ clip(int val, int lo, int hi)
 	return (val);
 }
 
-gint 
+gint
 keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 {
 	int tmp;
@@ -1669,7 +1669,7 @@ init_gtk_2(void)
 	draw_window_title();
 }
 
-void   
+void
 log_handler(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer notused)
 {
 	GtkWidget *dialog;
@@ -1707,7 +1707,7 @@ usage(void)
 	exit(EX_USAGE);
 }
 
-int 
+int
 main(int argc, char *argv[])
 {
 	int ch, enable_keyboard_cue = 0, initial_channel = 1, initial_bank = 0, initial_program = 0, full_midi_keyboard = 0;
@@ -1765,11 +1765,11 @@ main(int argc, char *argv[])
 		case 'l':
 			keyboard_layout = strdup(optarg);
 			break;
-			
+
 		case 't':
 			time_offsets_are_zero = 1;
 			break;
-			
+
 		case 'u':
 			send_program_change_at_reconnect = 1;
 			break;
