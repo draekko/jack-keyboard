@@ -42,6 +42,14 @@ find_package(GTK2 2.2 REQUIRED gtk)
 include_directories(${GTK2_INCLUDE_DIRS})
 target_link_libraries(jack-keyboard ${GTK2_LIBRARIES})
 
+# In preparation for GTK+3:
+# Set GDK/GTK+ flags to report deprecated includes and symbols.
+set(GTK_DEPRECATED_FLAGS "-DGTK_DISABLE_SINGLE_INCLUDES \
+  -DGDK_DISABLE_DEPRECATED \
+  -DGTK_DISABLE_DEPRECATED \
+  -DGSEAL_ENABLE")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GTK_DEPRECATED_FLAGS}")
+
 if(JackEnable)
 find_package(JACK)
 include_directories(${JACK_INCLUDE_DIR})
