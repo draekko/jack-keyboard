@@ -591,7 +591,7 @@ piano_keyboard_new(void)
 	GtkWidget *widget;
 	PianoKeyboard *pk;
 
-	widget = gtk_type_new(piano_keyboard_get_type());
+	widget = g_object_new(TYPE_PIANO_KEYBOARD, NULL);
 	pk = PIANO_KEYBOARD(widget);
 
 	pk->maybe_stop_sustained_notes = 0;
