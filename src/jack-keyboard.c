@@ -1039,6 +1039,7 @@ int grab_x_error_handler(Display *dpy, XErrorEvent *notused)
 GdkFilterReturn
 keyboard_grab_filter(GdkXEvent *xevent, GdkEvent *event, gpointer notused)
 {
+#if !GTK_CHECK_VERSION(3,0,0)
 	XEvent *xe;
 	XKeyEvent *xke;
 
@@ -1051,14 +1052,16 @@ keyboard_grab_filter(GdkXEvent *xevent, GdkEvent *event, gpointer notused)
 
 	/* Lie to GDK, pretending we are the proper recipient of this XEvent.  Without it,
 	   GDK would discard it. */
-	xke->window = GDK_WINDOW_XWINDOW(gtk_widget_get_window(window));
+	xke->window = GDK_WINDOW_XID(gtk_widget_get_window(window));
 
+#endif /* GTK_CHECK_VERSION */
 	return (GDK_FILTER_CONTINUE);
 }
 
 void
 ungrab_keyboard(void)
 {
+#if !GTK_CHECK_VERSION(3,0,0)
 	static int (*standard_x_error_handler)(Display *dpy, XErrorEvent *notused);
 
 	standard_x_error_handler = XSetErrorHandler(grab_x_error_handler);
@@ -1069,11 +1072,13 @@ ungrab_keyboard(void)
 	XSetErrorHandler(standard_x_error_handler);
 
 	keyboard_grabbed = 0;
+#endif /* GTK_CHECK_VERSION */
 }
 
 void
 grab_keyboard(void)
 {
+#if !GTK_CHECK_VERSION(3,0,0)
 	int i;
 	static int (*standard_x_error_handler)(Display *dpy, XErrorEvent *notused);
 
@@ -1129,6 +1134,7 @@ grab_keyboard(void)
 	}
 
 	gdk_window_add_filter(NULL, keyboard_grab_filter, NULL);
+#endif /* GTK_CHECK_VERSION */
 }
 
 #else /* ! HAVE_X11 */
@@ -1550,49 +1556,102 @@ init_gtk_1(int *argc, char ***argv)
 void
 init_gtk_2(void)
 {
+#if GTK_CHECK_VERSION(3,0,0)
+	GtkWidget *grid;
+#else
 	GtkTable *table;
+#endif
 	GtkWidget *label;
 	GtkCellRenderer *renderer;
 
+#if GTK_CHECK_VERSION(3,0,0)
+	grid = gtk_grid_new();
+	gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
+	gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
+#else
 	/* Table. */
 	table = GTK_TABLE(gtk_table_new(4, 8, FALSE));
 	gtk_table_set_row_spacings(table, 5);
 	gtk_table_set_col_spacings(table, 5);
+#endif
 
 	if (enable_gui)
+#if GTK_CHECK_VERSION(3,0,0)
+		gtk_container_add(GTK_CONTAINER(window), grid);
+#else
 		gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(table));
+#endif
 
 	/* Channel label and spin. */
 	label = gtk_label_new("Channel:");
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(label, TRUE);
+	gtk_label_set_xalign(GTK_LABEL(label), 1);
+	gtk_container_add(GTK_CONTAINER(grid), label);
+#else
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 0, 1, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	channel_spin = gtk_spin_button_new_with_range(1, CHANNEL_MAX, 1);
 	gtk_widget_set_can_focus(channel_spin, FALSE);
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(channel_spin, TRUE);
+	gtk_grid_attach_next_to(GTK_GRID(grid), channel_spin, label, GTK_POS_RIGHT, 1, 1);
+#else
 	gtk_table_attach(table, channel_spin, 1, 2, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	g_signal_connect(G_OBJECT(channel_spin), "value-changed", G_CALLBACK(channel_event_handler), NULL);
 
 	/* Bank label and spin. */
 	label = gtk_label_new("Bank:");
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(label, TRUE);
+	gtk_label_set_xalign(GTK_LABEL(label), 1);
+	gtk_grid_attach_next_to(GTK_GRID(grid), label, channel_spin, GTK_POS_RIGHT, 1, 1);
+#else
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 2, 3, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	bank_spin = gtk_spin_button_new_with_range(0, BANK_MAX, 1);
 	gtk_widget_set_can_focus(bank_spin, FALSE);
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(bank_spin, TRUE);
+	gtk_grid_attach_next_to(GTK_GRID(grid), bank_spin, label, GTK_POS_RIGHT, 1, 1);
+#else
 	gtk_table_attach(table, bank_spin, 3, 4, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	g_signal_connect(G_OBJECT(bank_spin), "value-changed", G_CALLBACK(bank_event_handler), NULL);
 
 	/* Program label and spin. */
 	label = gtk_label_new("Program:");
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(label, TRUE);
+	gtk_label_set_xalign(GTK_LABEL(label), 1);
+	gtk_grid_attach_next_to(GTK_GRID(grid), label, bank_spin, GTK_POS_RIGHT, 1, 1);
+#else
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 4, 5, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	program_spin = gtk_spin_button_new_with_range(0, PROGRAM_MAX, 1);
 	gtk_widget_set_can_focus(program_spin, FALSE);
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(program_spin, TRUE);
+	gtk_grid_attach_next_to(GTK_GRID(grid), program_spin, label, GTK_POS_RIGHT, 1, 1);
+#else
 	gtk_table_attach(table, program_spin, 5, 6, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	g_signal_connect(G_OBJECT(program_spin), "value-changed", G_CALLBACK(program_event_handler), NULL);
 
 	/* "Connected to" label and combo box. */
 	label = gtk_label_new("Connected to:");
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(label, TRUE);
+	gtk_label_set_xalign(GTK_LABEL(label), 1);
+	gtk_grid_attach_next_to(GTK_GRID(grid), label, program_spin, GTK_POS_RIGHT, 1, 1);
+#else
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 6, 7, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 
 	connected_to_store = gtk_list_store_new(1, G_TYPE_STRING);
 	connected_to_combo = gtk_combo_box_new_with_model(GTK_TREE_MODEL(connected_to_store));
@@ -1602,54 +1661,109 @@ init_gtk_2(void)
 	gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT(connected_to_combo), renderer, "text", 0, NULL);
 
 	gtk_widget_set_can_focus(connected_to_combo, FALSE);
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_focus_on_click(connected_to_combo, FALSE);
+	gtk_widget_set_hexpand(connected_to_combo, TRUE);
+	gtk_grid_attach_next_to(GTK_GRID(grid), connected_to_combo, label, GTK_POS_RIGHT, 1, 1);
+#else
 	gtk_combo_box_set_focus_on_click(GTK_COMBO_BOX(connected_to_combo), FALSE);
 	gtk_table_attach(table, connected_to_combo, 7, 8, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	gtk_widget_set_size_request(GTK_WIDGET(connected_to_combo), 200, -1);
 	g_signal_connect(G_OBJECT(connected_to_combo), "changed", G_CALLBACK(connected_to_event_handler), NULL);
 
 	/* Octave label and spin. */
 	label = gtk_label_new("Octave:");
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(label, TRUE);
+	gtk_label_set_xalign(GTK_LABEL(label), 1);
+	gtk_grid_attach(GTK_GRID(grid), label, 0, 1, 1, 1);
+#else
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 0, 1, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	octave_spin = gtk_spin_button_new_with_range(OCTAVE_MIN, OCTAVE_MAX, 1);
 	gtk_widget_set_can_focus(octave_spin, FALSE);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(octave_spin), octave);
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(octave_spin, TRUE);
+	gtk_grid_attach_next_to(GTK_GRID(grid), octave_spin, label, GTK_POS_RIGHT, 1, 1);
+#else
 	gtk_table_attach(table, octave_spin, 1, 2, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	g_signal_connect(G_OBJECT(octave_spin), "value-changed", G_CALLBACK(octave_event_handler), NULL);
 
 	/* "Grab keyboard" label and checkbutton. */
 	label = gtk_label_new("Grab keyboard:");
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(label, TRUE);
+	gtk_label_set_xalign(GTK_LABEL(label), 1);
+	gtk_grid_attach(GTK_GRID(grid), label, 4, 1, 1, 1);
+#else
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 4, 5, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	grab_keyboard_checkbutton = gtk_check_button_new();
 	gtk_widget_set_can_focus(grab_keyboard_checkbutton, FALSE);
 	g_signal_connect(G_OBJECT(grab_keyboard_checkbutton), "toggled", G_CALLBACK(grab_keyboard_handler), NULL);
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(grab_keyboard_checkbutton, TRUE);
+	gtk_grid_attach_next_to(GTK_GRID(grid), grab_keyboard_checkbutton, label, GTK_POS_RIGHT, 1, 1);
+#else
 	gtk_table_attach(table, grab_keyboard_checkbutton, 5, 6, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 
 	/* Velocity label and hscale */
 	label = gtk_label_new("Velocity:");
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(label, TRUE);
+	gtk_label_set_xalign(GTK_LABEL(label), 1);
+	gtk_grid_attach_next_to(GTK_GRID(grid), label, grab_keyboard_checkbutton, GTK_POS_RIGHT, 1, 1);
+
+	velocity_hscale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, VELOCITY_MIN, VELOCITY_MAX, 1);
+#else
 	gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
 	gtk_table_attach(table, label, 6, 7, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
 	velocity_hscale = gtk_hscale_new_with_range(VELOCITY_MIN, VELOCITY_MAX, 1);
+#endif
 	gtk_scale_set_draw_value(GTK_SCALE(velocity_hscale), FALSE);
 	gtk_widget_set_can_focus(velocity_hscale, FALSE);
 	g_signal_connect(G_OBJECT(velocity_hscale), "value-changed", G_CALLBACK(velocity_event_handler), NULL);
 	gtk_range_set_value(GTK_RANGE(velocity_hscale), VELOCITY_NORMAL);
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_hexpand(velocity_hscale, TRUE);
+	gtk_grid_attach_next_to(GTK_GRID(grid), velocity_hscale, label, GTK_POS_RIGHT, 1, 1);
+#else
 	gtk_table_attach(table, velocity_hscale, 7, 8, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	gtk_widget_set_size_request(GTK_WIDGET(velocity_hscale), 200, -1);
 
 	/* Sustain. It's a toggle button, not an ordinary one, because we want gtk_whatever_set_active() to work.*/
 	sustain_button = gtk_toggle_button_new_with_label("Sustain");
+#if GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_set_focus_on_click(sustain_button, FALSE);
+	gtk_widget_set_hexpand(sustain_button, TRUE);
+	gtk_grid_attach(GTK_GRID(grid), sustain_button, 0, 2, 8, 1);
+#else
 	gtk_button_set_focus_on_click(GTK_BUTTON(sustain_button), FALSE);
 	gtk_table_attach(table, sustain_button, 0, 8, 2, 3, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+#endif
 	g_signal_connect(G_OBJECT(sustain_button), "toggled", G_CALLBACK(sustain_event_handler), NULL);
 
 	/* PianoKeyboard widget. */
 	keyboard = PIANO_KEYBOARD(piano_keyboard_new());
 
 	if (enable_gui)
+#if GTK_CHECK_VERSION(3,0,0)
+	{
+		gtk_widget_set_hexpand(GTK_WIDGET(keyboard), TRUE);
+		gtk_widget_set_vexpand(GTK_WIDGET(keyboard), TRUE);
+		gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(keyboard), 0, 3, 8, 1);
+	}
+#else
 		gtk_table_attach_defaults(table, GTK_WIDGET(keyboard), 0, 8, 3, 4);
+#endif
 	else
 		gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(keyboard));
 

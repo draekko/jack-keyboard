@@ -75,7 +75,11 @@ draw_keyboard_cue(PianoKeyboard *pk)
 }
 
 static void
+#if GTK_CHECK_VERSION(3,0,0)
+draw_note(PianoKeyboard *pk, cairo_t *cr, int note)
+#else
 draw_note(PianoKeyboard *pk, int note)
+#endif
 {
 	if (note < pk->min_note)
 		return;
@@ -83,6 +87,13 @@ draw_note(PianoKeyboard *pk, int note)
 		return;
 	int is_white, x, w, h;
 
+#if GTK_CHECK_VERSION(3,0,0)
+	if (!cr)
+		cr = gdk_cairo_create(gtk_widget_get_window(GTK_WIDGET(pk)));
+
+	GdkRGBA black = { .red = 0.0, .green = 0.0, .blue = 0.0, .alpha = 1.0};
+	GdkRGBA white = { .red = 1.0, .green = 1.0, .blue = 1.0, .alpha = 1.0};
+#else
 	cairo_t *cr = gdk_cairo_create(gtk_widget_get_window(GTK_WIDGET(pk)));
 
 	GdkColor black = {0, 0, 0, 0};
@@ -90,6 +101,7 @@ draw_note(PianoKeyboard *pk, int note)
 
 	GtkWidget *widget;
 	GtkAllocation allocation;
+#endif
 
 	is_white = pk->notes[note].white;
 
@@ -101,26 +113,47 @@ draw_note(PianoKeyboard *pk, int note)
 		is_white = !is_white;
 
 	if (is_white)
+#if GTK_CHECK_VERSION(3,0,0)
+		gdk_cairo_set_source_rgba(cr, &white);
+#else
 		gdk_cairo_set_source_color(cr, &white);
+#endif
 	else
+#if GTK_CHECK_VERSION(3,0,0)
+		gdk_cairo_set_source_rgba(cr, &black);
+#else
 		gdk_cairo_set_source_color(cr, &black);
+#endif
 
 	cairo_rectangle(cr, x, 0, w, h);
 	cairo_fill(cr);
+#if GTK_CHECK_VERSION(3,0,0)
+	gdk_cairo_set_source_rgba(cr, &black);
+#else
 	gdk_cairo_set_source_color(cr, &black);
+#endif
 	cairo_rectangle(cr, x, 0, w, h);
 	cairo_stroke(cr);
 
+#if !GTK_CHECK_VERSION(3,0,0)
 	cairo_destroy(cr);
+#endif
 
 	if (pk->enable_keyboard_cue)
 		draw_keyboard_cue(pk);
 
 	/* We need to redraw black keys that partially obscure the white one. */
 	if (note < NNOTES - 2 && !pk->notes[note + 1].white)
+#if GTK_CHECK_VERSION(3,0,0)
+		draw_note(pk, cr, note + 1);
+#else
 		draw_note(pk, note + 1);
+#endif
 
 	if (note > 0 && !pk->notes[note - 1].white)
+#if GTK_CHECK_VERSION(3,0,0)
+		draw_note(pk, cr, note - 1);
+#else
 		draw_note(pk, note - 1);
 
 	/*
@@ -134,6 +167,7 @@ draw_note(PianoKeyboard *pk, int note)
 	gtk_paint_shadow(gtk_widget_get_style(widget), gtk_widget_get_window(widget), GTK_STATE_NORMAL, GTK_SHADOW_IN, NULL,
 	    widget, NULL, pk->widget_margin, 0, allocation.width - pk->widget_margin * 2 + 1,
 	    allocation.height);
+#endif
 }
 
 static int
@@ -156,7 +190,11 @@ press_key(PianoKeyboard *pk, int key)
 	pk->notes[key].pressed = 1;
 
 	g_signal_emit_by_name(GTK_WIDGET(pk), "note-on", key);
+#if GTK_CHECK_VERSION(3,0,0)
+	draw_note(pk, NULL, key);
+#else
 	draw_note(pk, key);
+#endif
 
 	return (1);
 }
@@ -181,7 +219,11 @@ release_key(PianoKeyboard *pk, int key)
 		return (0);
 
 	g_signal_emit_by_name(GTK_WIDGET(pk), "note-off", key);
+#if GTK_CHECK_VERSION(3,0,0)
+	draw_note(pk, NULL, key);
+#else
 	draw_note(pk, key);
+#endif
 
 	return (1);
 }
@@ -195,7 +237,11 @@ stop_unsustained_notes(PianoKeyboard *pk)
 		if (pk->notes[i].pressed && !pk->notes[i].sustained) {
 			pk->notes[i].pressed = 0;
 			g_signal_emit_by_name(GTK_WIDGET(pk), "note-off", i);
+#if GTK_CHECK_VERSION(3,0,0)
+			draw_note(pk, NULL, i);
+#else
 			draw_note(pk, i);
+#endif
 		}
 	}
 }
@@ -210,7 +256,11 @@ stop_sustained_notes(PianoKeyboard *pk)
 			pk->notes[i].pressed = 0;
 			pk->notes[i].sustained = 0;
 			g_signal_emit_by_name(GTK_WIDGET(pk), "note-off", i);
+#if GTK_CHECK_VERSION(3,0,0)
+			draw_note(pk, NULL, i);
+#else
 			draw_note(pk, i);
+#endif
 		}
 	}
 }
@@ -420,23 +470,45 @@ mouse_motion_event_handler(PianoKeyboard *pk, GdkEventMotion *event, gpointer no
 }
 
 static gboolean
+#if GTK_CHECK_VERSION(3,0,0)
+piano_keyboard_draw(GtkWidget *widget, cairo_t *cr)
+#else
 piano_keyboard_expose(GtkWidget *widget, GdkEventExpose *event)
+#endif
 {
 	int i;
 	PianoKeyboard *pk = PIANO_KEYBOARD(widget);
 
 	for (i = 0; i < NNOTES; i++)
+#if GTK_CHECK_VERSION(3,0,0)
+		draw_note(pk, NULL, i);
+#else
 		draw_note(pk, i);
+#endif
 
 	return (TRUE);
 }
 
+#if GTK_CHECK_VERSION(3,0,0)
+static void
+piano_keyboard_get_preferred_width(GtkWidget *widget, gint *minimal_width, gint *natural_width)
+{
+	*minimal_width = *natural_width = PIANO_KEYBOARD_DEFAULT_WIDTH;
+}
+
+static void
+piano_keyboard_get_preferred_height(GtkWidget *widget, gint *minimal_height, gint *natural_height)
+{
+	*minimal_height = *natural_height = PIANO_KEYBOARD_DEFAULT_HEIGHT;
+}
+#else
 static void
 piano_keyboard_size_request(GtkWidget *widget, GtkRequisition *requisition)
 {
 	requisition->width = PIANO_KEYBOARD_DEFAULT_WIDTH;
 	requisition->height = PIANO_KEYBOARD_DEFAULT_HEIGHT;
 }
+#endif
 
 static int is_black(int key)
 {
@@ -544,8 +616,14 @@ piano_keyboard_class_init(PianoKeyboardClass *klass)
 
 	widget_klass = (GtkWidgetClass*)klass;
 
+#if GTK_CHECK_VERSION(3,0,0)
+	widget_klass->draw = piano_keyboard_draw;
+	widget_klass->get_preferred_width = piano_keyboard_get_preferred_width;
+	widget_klass->get_preferred_height = piano_keyboard_get_preferred_height;
+#else
 	widget_klass->expose_event = piano_keyboard_expose;
 	widget_klass->size_request = piano_keyboard_size_request;
+#endif
 	widget_klass->size_allocate = piano_keyboard_size_allocate;
 }
 
@@ -638,7 +716,11 @@ piano_keyboard_set_note_on(PianoKeyboard *pk, int note)
 {
 	if (pk->notes[note].pressed == 0) {
 		pk->notes[note].pressed = 1;
+#if GTK_CHECK_VERSION(3,0,0)
+		draw_note(pk, NULL, note);
+#else
 		draw_note(pk, note);
+#endif
 	}
 }
 
@@ -648,7 +730,11 @@ piano_keyboard_set_note_off(PianoKeyboard *pk, int note)
 	if (pk->notes[note].pressed || pk->notes[note].sustained) {
 		pk->notes[note].pressed = 0;
 		pk->notes[note].sustained = 0;
+#if GTK_CHECK_VERSION(3,0,0)
+		draw_note(pk, NULL, note);
+#else
 		draw_note(pk, note);
+#endif
 	}
 }
 

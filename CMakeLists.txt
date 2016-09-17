@@ -27,6 +27,9 @@
 #
 cmake_minimum_required(VERSION 2.8)
 
+option(ENABLE_GTK2 "Enable GTK2 Version" ON)
+option(ENABLE_GTK3 "Enable GTK3 Version" OFF)
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 set(VERSION "2.7.2")
 
@@ -38,9 +41,20 @@ project(jack-keyboard)
 
 add_executable(jack-keyboard src/jack-keyboard src/pianokeyboard)
 
-find_package(GTK2 2.20 REQUIRED gtk)
-include_directories(${GTK2_INCLUDE_DIRS})
-target_link_libraries(jack-keyboard ${GTK2_LIBRARIES})
+find_package(PkgConfig REQUIRED)
+
+if(ENABLE_GTK3)
+  set(ENABLE_GTK2 OFF)
+  PKG_CHECK_MODULES(GTK3 "gtk+-3.0 >= 3.16" REQUIRED)
+  include_directories(${GTK3_INCLUDE_DIRS})
+  target_link_libraries(jack-keyboard ${GTK3_LIBRARIES})
+endif()
+
+if(ENABLE_GTK2)
+  PKG_CHECK_MODULES(GTK2 "gtk+-2.0 >= 2.20" REQUIRED)
+  include_directories(${GTK2_INCLUDE_DIRS})
+  target_link_libraries(jack-keyboard ${GTK2_LIBRARIES})
+endif()
 
 # In preparation for GTK+3:
 # Set GDK/GTK+ flags to report deprecated includes and symbols.
