@@ -960,15 +960,12 @@ init_lash(lash_args_t *args)
 #endif /* HAVE_LASH */
 
 gboolean
-sustain_event_handler(GtkToggleButton *widget, gpointer pressed)
+sustain_event_handler(GtkToggleButton *widget, gpointer not_used)
 {
-	if (pressed) {
-		gtk_toggle_button_set_active(widget, TRUE);
+	if (gtk_toggle_button_get_active(widget))
 		piano_keyboard_sustain_press(keyboard);
-	} else {
-		gtk_toggle_button_set_active(widget, FALSE);
+	else
 		piano_keyboard_sustain_release(keyboard);
-	}
 
 	return (FALSE);
 }
@@ -1474,9 +1471,9 @@ keyboard_event_handler(GtkWidget *widget, GdkEventKey *event, gpointer notused)
 	 */
 	if (event->keyval == GDK_KEY_space) {
 		if (event->type == GDK_KEY_PRESS)
-			gtk_button_pressed(GTK_BUTTON(sustain_button));
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sustain_button), TRUE);
 		else
-			gtk_button_released(GTK_BUTTON(sustain_button));
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sustain_button), FALSE);
 
 		return (TRUE);
 	}
@@ -1646,8 +1643,7 @@ init_gtk_2(void)
 	sustain_button = gtk_toggle_button_new_with_label("Sustain");
 	gtk_button_set_focus_on_click(GTK_BUTTON(sustain_button), FALSE);
 	gtk_table_attach(table, sustain_button, 0, 8, 2, 3, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
-	g_signal_connect(G_OBJECT(sustain_button), "pressed", G_CALLBACK(sustain_event_handler), (void *)1);
-	g_signal_connect(G_OBJECT(sustain_button), "released", G_CALLBACK(sustain_event_handler), (void *)0);
+	g_signal_connect(G_OBJECT(sustain_button), "toggled", G_CALLBACK(sustain_event_handler), NULL);
 
 	/* PianoKeyboard widget. */
 	keyboard = PIANO_KEYBOARD(piano_keyboard_new());
