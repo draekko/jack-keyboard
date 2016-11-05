@@ -256,7 +256,7 @@ warning_async(gpointer s)
 {
 	const char *str = (const char *)s;
 
-	g_warning(str);
+	g_warning("%s", str);
 
 	return (FALSE);
 }
@@ -947,7 +947,7 @@ init_lash(lash_args_t *args)
 	lash_client = lash_init(args, PACKAGE_NAME, LASH_Config_Data_Set, LASH_PROTOCOL(2, 0));
 
 	if (!lash_server_connected(lash_client)) {
-		g_critical("Cannot initialize LASH.  Continuing anyway.");
+		fprintf(stderr, "Cannot initialize LASH.  Continuing anyway.\n");
 		/* exit(EX_UNAVAILABLE); */
 
 		return;
@@ -1678,7 +1678,7 @@ log_handler(const gchar *log_domain, GLogLevelFlags log_level, const gchar *mess
 
 	if ((log_level | G_LOG_LEVEL_CRITICAL) == G_LOG_LEVEL_CRITICAL) {
 		dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR,
-			GTK_BUTTONS_CLOSE, message);
+			GTK_BUTTONS_CLOSE, "%s", message);
 
 		gtk_dialog_run(GTK_DIALOG(dialog));
 

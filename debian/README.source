@@ -1,0 +1,10 @@
+jack-keyboard for Debian
+------------------------
+
+  In order to regenerate 'debian/control' :
+
+     DEB_AUTO_UPDATE_DEBIAN_CONTROL=yes fakeroot debian/rules clean
+
+  Then check manually if everything's OK.
+
+ -- Alessio Treglia <alessio@debian.org>  Mon, 24 Jan 2011 13:38:34 +0100

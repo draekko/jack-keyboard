@@ -1,0 +1,37 @@
+Source: jack-keyboard
+Section: sound
+Priority: optional
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
+Uploaders:
+ Alessio Treglia <alessio@debian.org>,
+ Rosea Grammostola <rosea.grammostola@gmail.com>
+Build-Depends:
+ @cdbs@,
+ cmake,
+ libgtk2.0-dev,
+ libjack-dev
+Standards-Version: 3.9.3
+Homepage: http://jack-keyboard.sourceforge.net
+Vcs-Git: git://git.debian.org/git/pkg-multimedia/jack-keyboard.git
+Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/jack-keyboard.git
+
+Package: jack-keyboard
+Architecture: any
+Depends:
+ jackd,
+ ${misc:Depends},
+ ${shlibs:Depends}
+Recommends:
+ a2jmidid
+Suggests:
+ ghostess,
+ qjackctl,
+ whysynth
+Description: Virtual MIDI keyboard for JACK MIDI
+ JACK keyboard is a program that allows you to send JACK MIDI
+ events (play ;-) using your PC keyboard. It's somewhat similar to
+ vkeybd, except it uses JACK MIDI instead of ALSA, and the default
+ keyboard mapping is much better - it uses the same layout as
+ trackers (like Impulse Tracker) did, so you have two and half
+ octaves under your fingers.

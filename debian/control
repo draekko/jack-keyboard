@@ -1,0 +1,34 @@
+Source: jack-keyboard
+Section: sound
+Priority: optional
+Maintainer: Draekko <draekko.software@gmail.com>
+Build-Depends:
+ debhelper,
+ dh-buildinfo,
+ cdbs (>= 0.4.69~),
+ devscripts,
+ cmake,
+ libgtk2.0-dev,
+ libjack-dev
+Standards-Version: 3.9.3
+Homepage: https://github.com/draekko/jack-keyboard
+
+Package: jack-keyboard
+Architecture: any
+Depends:
+ jackd,
+ ${misc:Depends},
+ ${shlibs:Depends}
+Recommends:
+ a2jmidid
+Suggests:
+ ghostess,
+ qjackctl,
+ whysynth
+Description: Virtual MIDI keyboard for JACK MIDI
+ JACK keyboard is a program that allows you to send JACK MIDI
+ events (play ;-) using your PC keyboard. It's somewhat similar to
+ vkeybd, except it uses JACK MIDI instead of ALSA, and the default
+ keyboard mapping is much better - it uses the same layout as
+ trackers (like Impulse Tracker) did, so you have two and half
+ octaves under your fingers.

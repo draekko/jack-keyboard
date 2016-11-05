@@ -40,7 +40,7 @@ add_executable(jack-keyboard src/jack-keyboard src/pianokeyboard)
 
 find_package(GTK2 2.2 REQUIRED gtk)
 include_directories(${GTK2_INCLUDE_DIRS})
-target_link_libraries(jack-keyboard ${GTK2_LIBRARIES})
+target_link_libraries(jack-keyboard ${GTK2_LIBRARIES} gthread-2.0)
 
 if(JackEnable)
 find_package(JACK)
@@ -65,5 +65,5 @@ endif()
 
 install(TARGETS jack-keyboard RUNTIME DESTINATION bin)
 install(FILES pixmaps/jack-keyboard.png DESTINATION share/pixmaps)
-install(FILES src/jack-keyboard.desktop DESTINATION share/applications)
-install(FILES man/jack-keyboard.1 DESTINATION man/man1)
+install(FILES applications/jack-keyboard.desktop DESTINATION share/applications)
+install(FILES man/jack-keyboard.1 DESTINATION share/man1)
